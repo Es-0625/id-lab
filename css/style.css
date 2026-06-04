@@ -146,49 +146,32 @@ a {
   letter-spacing: -0.03em;
 }
 
-/* Project Slider */
+/* Projects */
 
 .project-slider-wrap {
   position: relative;
 }
 
 .project-slider {
-  display: flex;
-  gap: 22px;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  padding: 6px 4px 18px;
-}
-
-.project-slider::-webkit-scrollbar {
-  height: 8px;
-}
-
-.project-slider::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 999px;
-}
-
-.project-slider::-webkit-scrollbar-thumb {
-  background: rgba(125, 211, 252, 0.45);
-  border-radius: 999px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
 }
 
 .project-card {
-  min-width: 320px;
-  max-width: 320px;
-  min-height: 340px;
+  min-height: 320px;
   padding: 28px;
   display: flex;
   flex-direction: column;
-  scroll-snap-align: start;
-  border-radius: 26px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.055);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.18);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .project-card.highlight {
+  border-color: rgba(125, 211, 252, 0.3);
   background:
     linear-gradient(145deg, rgba(56, 189, 248, 0.12), rgba(168, 85, 247, 0.08)),
     rgba(255, 255, 255, 0.055);
@@ -196,7 +179,7 @@ a {
 
 .project-card:hover {
   transform: translateY(-5px);
-  transition: 0.2s ease;
+  background: rgba(255, 255, 255, 0.075);
   border-color: rgba(125, 211, 252, 0.45);
 }
 
@@ -249,32 +232,7 @@ a {
 /* Slider Buttons */
 
 .slider-btn {
-  position: absolute;
-  top: 50%;
-  z-index: 5;
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: 999px;
-  cursor: pointer;
-  color: #06111f;
-  background: #38bdf8;
-  font-size: 22px;
-  font-weight: 800;
-  transform: translateY(-50%);
-}
-
-.slider-btn.left {
-  left: -22px;
-}
-
-.slider-btn.right {
-  right: -22px;
-}
-
-.slider-btn:hover {
-  transform: translateY(-50%) scale(1.06);
-  transition: 0.2s ease;
+  display: none;
 }
 
 /* Tech Stack */
@@ -372,13 +330,12 @@ a {
     padding: 68px 5%;
   }
 
-  .project-card {
-    min-width: 82vw;
-    max-width: 82vw;
+  .project-slider {
+    grid-template-columns: 1fr;
   }
 
-  .slider-btn {
-    display: none;
+  .project-card {
+    min-height: auto;
   }
 
   .site-footer {
