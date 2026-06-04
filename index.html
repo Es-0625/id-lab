@@ -1,20 +1,169 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>ID's Lab</title>
+  <meta name="description" content="ID's Lab - 개인 프로젝트, 클라우드 실습, 개발 문서 아카이브" />
+
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
-  <h1>ID's Lab</h1>
-  <p>작게 만들고, 직접 배포하고, 끝까지 기록합니다.</p>
+  <header class="site-header">
+    <a class="logo" href="#">ID's Lab</a>
 
-  <h2>Projects</h2>
-  <ul>
-    <li><a href="#">총알피하기</a></li>
-    <li><a href="#">DesktopPet</a></li>
-    <li><a href="#">ID's QuizBank</a></li>
-    <li><a href="https://azure.id-lab.cloud">Azure Practice Lab</a></li>
-  </ul>
+    <nav class="nav">
+      <a href="#projects">Projects</a>
+      <a href="#stack">Stack</a>
+      <a href="#docs">Docs</a>
+      <a href="https://github.com/es-0625" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-badge">Cloud · Web · Game · Desktop App</div>
+
+      <h1>
+        작게 만들고,<br />
+        직접 배포하고,<br />
+        끝까지 기록합니다.
+      </h1>
+
+      <p class="hero-desc">
+        웹 게임, 데스크톱 앱, 문제은행, 클라우드 실습 기록을 모아둔
+        개인 프로젝트 허브입니다.
+      </p>
+
+      <div class="hero-actions">
+        <a class="btn primary" href="#projects">프로젝트 보기</a>
+        <a class="btn secondary" href="https://github.com/es-0625" target="_blank" rel="noopener noreferrer">
+          GitHub 보기
+        </a>
+      </div>
+    </section>
+
+    <section id="projects" class="section">
+      <div class="section-heading">
+        <p>Featured Projects</p>
+        <h2>프로젝트</h2>
+      </div>
+
+      <div class="project-grid">
+        <article class="project-card">
+          <span class="tag">Web Game</span>
+          <h3>총알피하기</h3>
+          <p>
+            시간이 지날수록 총알 수와 난이도가 증가하는 웹 기반 회피 게임입니다.
+            Codex를 활용해 구현하고 수정 이력을 관리합니다.
+          </p>
+          <div class="stack">HTML · CSS · JavaScript</div>
+          <div class="card-actions">
+            <a href="#" target="_blank" rel="noopener noreferrer">플레이하기</a>
+            <a href="#" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <span class="tag">Desktop App</span>
+          <h3>DesktopPet</h3>
+          <p>
+            WinUI 3 기반 데스크톱 펫 프로그램입니다.
+            투명 배경, 스킨 다운로드, 경량 렌더링 구조를 목표로 합니다.
+          </p>
+          <div class="stack">C# · WinUI 3 · ASP.NET Core</div>
+          <div class="card-actions">
+            <a href="#" target="_blank" rel="noopener noreferrer">소개보기</a>
+            <a href="#" target="_blank" rel="noopener noreferrer">다운로드</a>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <span class="tag">Web Service</span>
+          <h3>ID's QuizBank</h3>
+          <p>
+            문제 업로드, 관리자 승인, 시험 기록, 오답노트를 제공하는
+            로컬 기반 객관식 문제은행 웹 서비스입니다.
+          </p>
+          <div class="stack">Node.js · Express · Vite · DB</div>
+          <div class="card-actions">
+            <a href="#" target="_blank" rel="noopener noreferrer">소개보기</a>
+            <a href="#" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </article>
+
+        <article class="project-card highlight">
+          <span class="tag">Azure Lab</span>
+          <h3>Azure Practice Lab</h3>
+          <p>
+            Azure VM, Application Gateway, VMSS, Nginx, Tomcat 배포 실습을 정리합니다.
+            실습 중일 때만 서브도메인에 연결합니다.
+          </p>
+          <div class="stack">Azure · Linux · Nginx · Tomcat</div>
+          <div class="card-actions">
+            <a href="https://azure.id-lab.cloud" target="_blank" rel="noopener noreferrer">실습 주소</a>
+            <a href="#" target="_blank" rel="noopener noreferrer">문서보기</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="stack" class="section">
+      <div class="section-heading">
+        <p>Tech Stack</p>
+        <h2>기술 스택</h2>
+      </div>
+
+      <div class="stack-list">
+        <span>AWS</span>
+        <span>Azure</span>
+        <span>Linux</span>
+        <span>Nginx</span>
+        <span>Tomcat</span>
+        <span>Java</span>
+        <span>JavaScript</span>
+        <span>Node.js</span>
+        <span>Express</span>
+        <span>C#</span>
+        <span>WinUI 3</span>
+        <span>MySQL</span>
+        <span>GitHub</span>
+      </div>
+    </section>
+
+    <section id="docs" class="section docs-section">
+      <div class="section-heading">
+        <p>Development Docs</p>
+        <h2>개발 문서</h2>
+      </div>
+
+      <div class="docs-grid">
+        <div class="doc-item">
+          <h3>요구사항 정의</h3>
+          <p>프로젝트의 목표, 기능, 제약 조건을 정리합니다.</p>
+        </div>
+
+        <div class="doc-item">
+          <h3>수정 이력</h3>
+          <p>원본에서 어떤 부분을 수정했는지 기록합니다.</p>
+        </div>
+
+        <div class="doc-item">
+          <h3>트러블슈팅</h3>
+          <p>문제 상황, 시도한 방법, 해결 결과, 학습 포인트를 정리합니다.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© ID's Lab</p>
+    <p>
+      <a href="https://github.com/es-0625" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <span>·</span>
+      <a href="mailto:aa3181@gmail.com">Email</a>
+    </p>
+  </footer>
 </body>
 </html>
