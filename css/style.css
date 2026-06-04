@@ -331,11 +331,34 @@ a {
   }
 
   .project-slider {
-    grid-template-columns: 1fr;
+    display: flex;
+    gap: 16px;
+    margin-right: -5%;
+    overflow-x: auto;
+    padding: 4px 5% 16px 0;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
   }
 
   .project-card {
+    min-width: 82vw;
     min-height: auto;
+    scroll-snap-align: start;
+  }
+
+  .project-slider::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .project-slider::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 999px;
+  }
+
+  .project-slider::-webkit-scrollbar-thumb {
+    background: rgba(125, 211, 252, 0.45);
+    border-radius: 999px;
   }
 
   .site-footer {
