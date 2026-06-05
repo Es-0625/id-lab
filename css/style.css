@@ -398,6 +398,35 @@ a.doc-item:hover {
   color: #7dd3fc;
 }
 
+.diana-runner {
+  position: fixed;
+  left: 0;
+  bottom: 10px;
+  z-index: 30;
+  width: clamp(130px, 15vw, 220px);
+  height: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.28));
+  animation: diana-patrol 16s ease-in-out infinite alternate;
+}
+
+@keyframes diana-patrol {
+  from {
+    transform: translateX(4vw);
+  }
+
+  to {
+    transform: translateX(calc(100vw - 100% - 4vw));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diana-runner {
+    animation: none;
+    transform: translateX(4vw);
+  }
+}
+
 /* Responsive */
 
 @media (max-width: 1200px) {
@@ -485,5 +514,11 @@ a.doc-item:hover {
   .site-footer {
     flex-direction: column;
     gap: 8px;
+  }
+
+  .diana-runner {
+    bottom: 6px;
+    width: clamp(84px, 28vw, 128px);
+    animation-duration: 12s;
   }
 }
