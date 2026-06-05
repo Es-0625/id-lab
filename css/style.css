@@ -235,6 +235,92 @@ a {
   display: none;
 }
 
+.private-network {
+  margin-top: 36px;
+  padding: 26px;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(34, 197, 94, 0.055)),
+    rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.private-network-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.private-network-heading p {
+  margin: 0 0 7px;
+  color: #7dd3fc;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.private-network-heading h3 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.private-network-heading span {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border-radius: 999px;
+  color: #bbf7d0;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(187, 247, 208, 0.16);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.private-network-note {
+  margin: 14px 0 22px;
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.private-link-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.private-link-card {
+  min-height: 104px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.private-link-card:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.075);
+  border-color: rgba(125, 211, 252, 0.42);
+}
+
+.private-link-card span {
+  color: #f4f7fb;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.private-link-card strong {
+  margin-top: 16px;
+  color: #7dd3fc;
+  font-size: 13px;
+  font-weight: 800;
+  word-break: break-all;
+}
+
 /* Tech Stack */
 
 .stack-list {
@@ -318,6 +404,10 @@ a.doc-item:hover {
   .docs-grid {
     grid-template-columns: 1fr;
   }
+
+  .private-link-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 720px) {
@@ -367,6 +457,15 @@ a.doc-item:hover {
     min-width: 82vw;
     min-height: auto;
     scroll-snap-align: start;
+  }
+
+  .private-network {
+    margin-top: 28px;
+    padding: 22px;
+  }
+
+  .private-network-heading {
+    flex-direction: column;
   }
 
   .project-slider::-webkit-scrollbar {
