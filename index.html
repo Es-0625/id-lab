@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>이드's Lab</title>
-  <meta name="description" content="이드's Lab - 개인 프로젝트, 클라우드 실습, 개발 문서 아카이브" />
+  <meta name="description" content="이드's Lab - 개인 프로젝트, 클라우드 실습, 기술스택과 개발 문서 아카이브" />
 
   <link rel="stylesheet" href="./css/style.css" />
 </head>
@@ -32,7 +32,7 @@
       </h1>
 
       <p class="hero-desc">
-        웹 게임, 데스크톱 앱, 지도 프로젝트, 문제은행, 클라우드 실습 기록을 모아둔
+        웹 게임, 데스크톱 앱, 지도 프로젝트, 클라우드 실습 기록을 모아둔
         개인 프로젝트 허브입니다.
       </p>
 
@@ -60,7 +60,7 @@
             <span class="tag">Map Project</span>
             <h3>페이코맵</h3>
             <p>
-              지도 기반 화면과 위치 정보를 활용하는 웹 프로젝트입니다.
+              지도 기반 화면과 위치 정보를 사용하는 웹 프로젝트입니다.
               별도 페이지에서 페이코맵을 확인할 수 있습니다.
             </p>
             <div class="stack">HTML · CSS · JavaScript</div>
@@ -78,10 +78,10 @@
             <span class="tag">Web Game</span>
             <h3>총알피하기</h3>
             <p>
-              시간이 지날수록 총알 수와 난이도가 증가하는 웹 기반 회피 게임입니다.
-              Codex를 활용해 구현하고 수정 이력을 관리합니다.
+              시간이 지날수록 총알 수와 속도가 증가하는 웹 기반 회피 게임입니다.
+              게임 루프, 충돌 판정, 점수 계산을 실습했습니다.
             </p>
-            <div class="stack">HTML · CSS · JavaScript</div>
+            <div class="stack">HTML · CSS · JavaScript · Canvas</div>
             <div class="card-actions">
               <a href="#" target="_blank" rel="noopener noreferrer">플레이하기</a>
               <a href="#" target="_blank" rel="noopener noreferrer">GitHub</a>
@@ -93,7 +93,7 @@
             <h3>DesktopPet</h3>
             <p>
               WinUI 3 기반 데스크톱 펫 프로그램입니다.
-              투명 배경, 스킨 다운로드, 경량 렌더링 구조를 목표로 합니다.
+              투명 배경, 스킨 다운로드, 경량 렌더링 구조를 목표로 설계하고 있습니다.
             </p>
             <div class="stack">C# · WinUI 3 · ASP.NET Core</div>
             <div class="card-actions">
@@ -107,7 +107,7 @@
             <h3>ID's QuizBank</h3>
             <p>
               문제 업로드, 관리자 승인, 시험 기록, 오답노트를 제공하는
-              로컬 기반 객관식 문제은행 웹 서비스입니다.
+              로컬 기반 객관식 문제은행 서비스입니다.
             </p>
             <div class="stack">Node.js · Express · Vite · DB</div>
             <div class="card-actions">
@@ -120,10 +120,10 @@
             <span class="tag">Azure Lab</span>
             <h3>Azure Practice Lab</h3>
             <p>
-              Azure VM, Application Gateway, VMSS, Nginx, Tomcat 배포 실습을 정리합니다.
-              실습 중일 때만 서브도메인에 연결합니다.
+              Azure VM, Application Gateway, VMSS, NGINX, Tomcat 배포 실습을 정리합니다.
+              실습 중인 서버는 서브도메인에 연결했습니다.
             </p>
-            <div class="stack">Azure · Linux · Nginx · Tomcat</div>
+            <div class="stack">Azure · Linux · NGINX · Tomcat</div>
             <div class="card-actions">
               <a href="https://azure.id-lab.cloud" target="_blank" rel="noopener noreferrer">
                 실습 주소
@@ -144,23 +144,38 @@
     <section id="stack" class="section">
       <div class="section-heading">
         <p>Tech Stack</p>
-        <h2>기술 스택</h2>
+        <h2>기술스택</h2>
       </div>
+
+      <p class="stack-intro">
+        프로젝트와 인프라 실습에서 사용한 기술을 정리했습니다. 자세한 학습 범위와 공식문서는 노션 문서에서 확인할 수 있습니다.
+      </p>
 
       <div class="stack-list">
         <span>AWS</span>
         <span>Azure</span>
         <span>Linux</span>
-        <span>Nginx</span>
+        <span>NGINX</span>
+        <span>Apache</span>
         <span>Tomcat</span>
-        <span>Java</span>
         <span>JavaScript</span>
         <span>Node.js</span>
         <span>Express</span>
+        <span>ASP.NET Core</span>
         <span>C#</span>
         <span>WinUI 3</span>
         <span>MySQL</span>
-        <span>GitHub</span>
+        <span>SQLite</span>
+        <span>GitHub Pages</span>
+      </div>
+
+      <div class="stack-actions">
+        <a class="btn primary" href="https://app.notion.com/p/376ed08c4f8381a08770ffd06b6dd68a" target="_blank" rel="noopener noreferrer">
+          기술스택 문서 보기
+        </a>
+        <a class="btn secondary" href="https://app.notion.com/p/376ed08c4f83818eb0bdf3fab8eee41a" target="_blank" rel="noopener noreferrer">
+          원본 학습 정리
+        </a>
       </div>
     </section>
 
@@ -171,14 +186,14 @@
       </div>
 
       <div class="docs-grid">
+        <a class="doc-item" href="https://app.notion.com/p/376ed08c4f8381a08770ffd06b6dd68a" target="_blank" rel="noopener noreferrer">
+          <h3>기술스택 & 공식문서</h3>
+          <p>AWS, Azure, Linux, Web/WAS, Backend, Frontend 공식문서를 한 곳에 정리했습니다.</p>
+        </a>
+
         <div class="doc-item">
           <h3>요구사항 정의</h3>
           <p>프로젝트의 목표, 기능, 제약 조건을 정리합니다.</p>
-        </div>
-
-        <div class="doc-item">
-          <h3>수정 이력</h3>
-          <p>원본에서 어떤 부분을 수정했는지 기록합니다.</p>
         </div>
 
         <div class="doc-item">
