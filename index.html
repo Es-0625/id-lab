@@ -129,6 +129,7 @@ h1,h2,h3,h4,p{margin:0}
 .intro-photo .frame{aspect-ratio:4/5; border:1.5px dashed var(--ink-3); border-radius:18px; background:var(--mist); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; color:var(--ink-3)}
 .intro-photo .frame span{font-weight:700; font-size:15px}
 .intro-photo .frame small{font-size:12px; opacity:.8}
+.intro-photo .photo{width:100%; height:auto; aspect-ratio:4/5; object-fit:cover; object-position:50% 30%; border-radius:18px; border:1px solid var(--line); background:var(--mist)}
 .intro-joke{margin-top:28px; font-size:14px; color:var(--ink-3)}
 .intro-joke b{color:var(--ink); font-weight:700}
 
@@ -269,7 +270,7 @@ h1,h2,h3,h4,p{margin:0}
   .page{height:auto; min-height:100svh; padding:96px var(--pad) 72px}
   .hero-ghost{font-size:clamp(64px,24vw,140px)}
   .intro-grid{grid-template-columns:1fr; gap:34px}
-  .intro-photo .frame{max-width:300px}
+  .intro-photo .frame,.intro-photo .photo{max-width:300px}
   .skills .edu-grid{grid-template-columns:1fr; gap:30px}
   .projects .shell{grid-template-columns:1fr; height:auto; gap:16px}
   .tabs{flex-direction:row; flex-wrap:wrap}
@@ -346,10 +347,7 @@ h1,h2,h3,h4,p{margin:0}
             </div>
           </div>
           <div class="intro-photo rise d3">
-            <div class="frame" role="img" aria-label="프로필 사진 자리">
-              <span>프로필 사진</span>
-              <small>정리본에서 교체</small>
-            </div>
+            <img class="photo" src="assets/profile.webp" width="1106" height="1422" alt="송진하 프로필 사진" />
           </div>
         </div>
       </div>
