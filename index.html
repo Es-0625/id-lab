@@ -152,6 +152,7 @@ h1,h2,h3,h4,p{margin:0}
 .tl-year{font-family:var(--disp); font-weight:800; font-size:21px; color:var(--ink)}
 .tl-role{font-weight:700; font-size:15px; margin-top:8px}
 .tl-desc{font-size:13px; color:var(--ink-3); margin-top:5px; line-height:1.5; max-width:22ch}
+.tl-win{font-size:12px; color:var(--blue); font-weight:600; margin-top:8px; line-height:1.5; max-width:22ch}
 .career .ph-note{margin-top:22px}
 
 /* ===== ④ 기술·교육 ===== */
@@ -171,7 +172,7 @@ h1,h2,h3,h4,p{margin:0}
 .skills .ph-note{margin-top:16px}
 
 /* ===== ⑤ 대표 프로젝트 ===== */
-.projects .shell{display:grid; grid-template-columns:1fr 290px; gap:22px; height:clamp(460px,66svh,600px)}
+.projects .shell{display:grid; grid-template-columns:1fr 290px; gap:22px; height:clamp(480px,80svh,660px)}
 .panel{background:var(--panel); color:var(--on-panel); border-radius:20px; padding:clamp(26px,3.2vw,42px); position:relative; overflow:hidden; display:flex; flex-direction:column}
 .slide{display:none; flex-direction:column; height:100%; overflow:auto}
 .slide.on{display:flex; animation:fade .5s var(--ease)}
@@ -387,7 +388,7 @@ h1,h2,h3,h4,p{margin:0}
           <div class="tl-item"><div class="tl-date">2018.03 – 2022.12</div><div class="tl-co">YouLohas</div><div class="tl-role">가족사업 업무 담당</div><div class="tl-desc">유가공 회계·생산 보조, 거래처·고객 관리와 온라인 판매 운영</div></div>
           <div class="tl-item"><div class="tl-date">2019.06 – 2021.12</div><div class="tl-co">숲속의목장</div><div class="tl-role">대표 · 목장 운영</div><div class="tl-desc">낙농 목장의 사육·우유 품질·시설 관리 등 운영 전반</div></div>
           <div class="tl-item"><div class="tl-date">2021.04 – 2022.12</div><div class="tl-co">진하축산</div><div class="tl-role">대표 · 사육 및 시설 관리</div><div class="tl-desc">송아지 사육 전반과 목장 시설 관리</div></div>
-          <div class="tl-item"><div class="tl-date">2024.07 – 2025.11</div><div class="tl-co">스피츠</div><div class="tl-role">CS 관리자 → 교환·반품센터 운영</div><div class="tl-desc">신설 교환·반품부서·영등포센터의 운영 기준·매뉴얼·업무 공유 체계 정리</div></div>
+          <div class="tl-item"><div class="tl-date">2024.07 – 2025.11</div><div class="tl-co">스피츠</div><div class="tl-role">CS 관리자 → 교환·반품센터 운영</div><div class="tl-desc">신설 교환·반품부서·영등포센터의 운영 기준·매뉴얼·업무 공유 체계 정리</div><div class="tl-win">접수 점검·호환 안내 개선 → 오구매 교환·반품 월 50여 건→1~2건, 불필요 건수 약 80%↓·전체 손실 약 64%↓(’24.8 대비 10·11월)</div></div>
         </div>
         <p class="overlap rise d4">※ YouLohas · 숲속의목장 · 진하축산은 일부 기간 병행한 가족 사업입니다. 교육 이력은 ‘기술 · 교육’에서 다룹니다.</p>
       </div>
@@ -441,17 +442,20 @@ h1,h2,h3,h4,p{margin:0}
             <article class="slide on" id="p0">
               <div class="code">중간 프로젝트 · 3-TIER</div>
               <h3>Spring PetClinic · AWS 3계층 웹 서비스</h3>
-              <div class="meta">2026.06 · 팀 프로젝트 · Web / WAS / DB</div>
+              <div class="meta">2026.06.30 – 07.13 · 팀 AWSome 5명 · AWS 3계층(Web · WAS · DB)</div>
               <a class="src" href="projects/petclinic.html" style="align-self:flex-start;margin-top:12px;color:#fff;border:1px solid rgba(245,246,248,.5);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700">프로젝트 기록 자세히 읽기 ↗</a>
-              <p class="detail">Web · WAS · DB를 분리한 AWS 환경에 Spring PetClinic을 배포·연결했습니다. 서비스 리소스(Web/WAS)를 담당했고, 메모리 부족(OOM) 상황에서 사용 소스와 자원 조건을 대조해 WAS 사양을 조정한 뒤 같은 조건에서 다시 확인했습니다. <span style="opacity:.7">(Apache → Internal ALB → Tomcat → Aurora)</span></p>
+              <p class="detail">Web · WAS · DB의 역할을 분리한 AWS 환경에 Spring PetClinic을 배포하고, 부하 변화와 일부 서버 장애에 대응하는 서비스를 구성했습니다. 저는 서비스 리소스(Web/WAS)를 맡아 Apache · Tomcat 구성과 PetClinic 배포·연결, 메모리 부족 대응을 담당했습니다. <span style="opacity:.7">(사용자 → 외부 ALB → Apache → 내부 ALB → Tomcat · PetClinic → Aurora)</span></p>
               <div class="evlabel">검증 근거 · 개인 담당</div>
               <div class="feats">
-                <div class="feat"><span class="ok">OK</span><p><b>Web · WAS 티어 분리</b> <span>— Apache · Tomcat · PetClinic 배포·연결 담당</span></p></div>
-                <div class="feat"><span class="ok">OK</span><p><b>OOM 원인 검토</b> <span>— 소스·자원 조건 대조 후 WAS t3.micro → t3.small 조정</span></p></div>
-                <div class="feat"><span class="ok">OK</span><p><b>동일 조건 재검증</b> <span>— 사양 변경 후 안정 동작 확인</span></p></div>
+                <div class="feat"><span class="ok">OK</span><p><b>Web 요청 중계 구성</b> <span>— Apache에서 내부 ALB로 전달. WAS 사설 IP 직접 연결 → 내부 ALB 경유로 변경해 증설·교체에 대응</span></p></div>
+                <div class="feat"><span class="ok">OK</span><p><b>WAS · PetClinic 배포</b> <span>— Tomcat에 배포, petclinic.war를 ROOT.war로 올려 접속 경로를 /로 맞추고 Aurora 연결 구성</span></p></div>
+                <div class="feat"><span class="ok">OK</span><p><b>메모리 부족 대응</b> <span>— 조회 제한 없는 원본 소스가 메모리 부담을 키운 것으로 보고(추정), 원본 유지 조건에서 WAS t3.micro → t3.small·JVM 힙 512m → 768m 조정</span></p></div>
+                <div class="feat"><span class="ok">OK</span><p><b>동일 조건 재검증</b> <span>— 사양 변경 후 같은 시험 조건에서 안정 동작 확인</span></p></div>
               </div>
+              <div class="team"><b>팀 결과</b> — Web·WAS 자동 확장·축소(2/2/4, CPU 40%), 인스턴스 종료 시 ASG 대체·같은 AZ 동시 중단 시 다른 AZ 유지, 내부 ALB 수동 Blue/Green 전환·롤백, DB 장애 조치 비교(Aurora 17초 · RDS 약 35초), PITR 백업 복원·데이터 대조, 태그 조건 IAM 권한 분리와 WAF · CloudWatch→Discord 알림을 검증했습니다. <span>※ 17초·약 35초는 각 DB 반복 시험의 최대 관측 복구 시간(평균·보장 아님)</span></div>
+              <div class="limit"><b>한계 · 보완</b> — 부하 시험은 각 50 VU 조건(최대 수용 인원 아님), Blue/Green은 해당 전환 시험에서 실패 요청 미관찰(무중단 보장 아님). 비용을 위해 Aurora 사양을 낮췄으나 절감액은 미산출, 404·OOM 근본 원인과 RTO 1시간 달성 여부는 미확인입니다.</div>
               <div class="srcs">
-                <span class="src">근거: 프로젝트 개요 · 서비스/DB 관리 문서 (공개 범위 확인 후 연결)</span>
+                <span class="src">근거: 32쪽 발표자료 · 구축/운영 문서 · 시연 영상 (공개 범위 확인 후 연결)</span>
               </div>
             </article>
             <article class="slide" id="p1">
@@ -459,12 +463,13 @@ h1,h2,h3,h4,p{margin:0}
               <h3>Retail Store · AWS 운영 &amp; GCP 재해복구</h3>
               <div class="meta">2026.08 – 10 · 팀 AWSome 5명</div>
               <a class="src" href="projects/retail-store.html" style="align-self:flex-start;margin-top:12px;color:#fff;border:1px solid rgba(245,246,248,.5);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700">프로젝트 기록 자세히 읽기 ↗</a>
-              <p class="detail">AWS(EKS · RDS)에서 쇼핑몰을 운영하고 완료 주문을 GCP(GKE · Cloud SQL)에 복제해, 장애 시 승인 후 전환하는 환경을 구성했습니다. CI/CD를 담당해 이미지 빌드·게시, 배포 입력·버전 관리, AWS Argo CD의 수동 Sync와 결과 확인을 연결했습니다.</p>
+              <p class="detail">AWS(EKS · RDS)에서 쇼핑몰을 운영하고 완료 주문을 GCP(GKE · Cloud SQL)에 복제해, 장애 시 승인 후 전환하는 환경을 구성했습니다. CI/CD(이미지 빌드·게시, AWS Argo CD 수동 Sync)와 함께, AWS 리전 장애에 대비한 GCP 재해복구(DR) PoC를 맡아 복구 환경 구성과 전환 검증을 담당했습니다.</p>
               <div class="evlabel">검증 근거 · 개인 담당</div>
               <div class="feats">
                 <div class="feat"><span class="ok">OK</span><p><b>이미지 빌드 · 게시</b> <span>— GitHub Actions로 검사·빌드, ECR · Artifact Registry 게시</span></p></div>
                 <div class="feat"><span class="ok">OK</span><p><b>AWS Argo CD 수동 Sync</b> <span>— 승인한 배포 입력을 수동 동기화로 반영</span></p></div>
                 <div class="feat"><span class="ok">OK</span><p><b>경로 정렬</b> <span>— GCP 설정 경로와 CI 검사 경로 불일치 수정 (9/22 커밋)</span></p></div>
+                <div class="feat"><span class="ok">OK</span><p><b>GCP 재해복구(DR) PoC</b> <span>— GKE 복구 환경·Cloud DMS 복제 구성, 승인(Slack → DB 승격·DNS) 후 전환해 AWS 중단 상태에서 정상 처리 확인</span></p></div>
               </div>
               <div class="team"><b>팀 결과</b> — 최대 100 VU 혼합 부하(HTTP 79,282건 · 실패 0 · p95 71.50ms, 주문 20/20), 승인 후 GCP 전환 200.601초 관측. <span>※ 300명은 목표(미실시), 일부 검사 실패 존재, 200.601초는 관측값으로 공식 RTO 아님</span></div>
               <div class="limit"><b>한계 · 보완</b> — NetworkPolicy는 작성했으나 미적용·미시험, RDS Multi-AZ · 백업 Restore 미수행. 30일 교대 계정 · Blue/Green은 후속 설계. GCP 최종 배포 도구를 Argo CD로 단정하지 않습니다.</div>
