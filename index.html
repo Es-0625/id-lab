@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<script>document.documentElement.classList.add('js')</script>
 <title>이드's Lab — 송진하 포트폴리오</title>
 <meta name="description" content="작게 만들고, 직접 배포하고, 끝까지 기록합니다 — 클라우드 엔지니어 송진하의 포트폴리오." />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css" />
@@ -15,13 +16,23 @@
   --paper:#ffffff;
   --ink:#0a0a0b;
   --ink-2:#4a4b52;
-  --ink-3:#8a8c95;
+  --ink-3:#6b6d76;            /* 흰 바탕 5.15:1, mist 바탕 4.72:1 */
   --blue:#0b0be8;
+  --blue-on-dark:#6b7bff;     /* 검은 바탕 위 파랑 글자·포커스 링(5.56:1) */
   --mist:#f4f5f7;
   --line:#e6e7ea;
   --panel:#0a0a0b;
   --on-panel:#f5f6f8;
   --on-panel-soft:rgba(245,246,248,.62);
+  --on-panel-line:rgba(245,246,248,.2);
+  --on-panel-line-strong:rgba(245,246,248,.5);
+  --on-panel-track:rgba(245,246,248,.14);
+  /* 로딩 화면 전용 */
+  --lb:#2b5bff;
+  --ok:#30d47a;
+  --dim:#5a5c66;
+  --lb-glow:rgba(43,91,255,.16);
+  --ok-glow:rgba(48,212,122,.16);
 
   --disp:"Manrope",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
   --sans:"Pretendard",-apple-system,BlinkMacSystemFont,"Noto Sans KR",system-ui,sans-serif;
@@ -32,14 +43,17 @@
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
+html,body{overflow-x:clip}
 body{
   margin:0; background:var(--paper); color:var(--ink);
   font-family:var(--sans); -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
 }
 a{color:inherit; text-decoration:none}
 :focus-visible{outline:2.5px solid var(--blue); outline-offset:3px; border-radius:2px}
+.panel :focus-visible,.contact :focus-visible,.top.on-dark :focus-visible{outline-color:var(--blue-on-dark)}
 img{display:block; max-width:100%}
 h1,h2,h3,h4,p{margin:0}
+h1,h2,h3{text-wrap:balance; overflow-wrap:break-word}
 
 /* ===== 공통 조각 ===== */
 .chip{display:inline-flex; align-items:center; gap:7px; padding:7px 13px; border:1px solid var(--line); border-radius:999px; color:var(--ink-2); background:var(--paper); font-size:13px; font-weight:600}
@@ -61,19 +75,23 @@ h1,h2,h3,h4,p{margin:0}
 /* ===== 인트로(파이프라인 로딩) 오버레이 ===== */
 .intro{position:fixed; inset:0; z-index:100; background:var(--ink); color:var(--on-panel); display:grid; place-items:center; padding:0 var(--pad); transition:transform .9s var(--ease); cursor:pointer}
 .intro.done{transform:translateY(-100%)}
-.load{--lb:#2b5bff; --ok:#30d47a; --dim:#5a5c66; width:min(640px,86vw); display:flex; flex-direction:column; align-items:center; text-align:center}
+/* 스크립트가 꺼져 있으면 로딩 화면을 띄우지 않고, 스크립트가 도중에 멈춰도 6초 뒤에는 걷힌다 */
+html:not(.js) .intro{display:none}
+.js .intro{animation:intro-failsafe .6s var(--ease) 6s forwards}
+@keyframes intro-failsafe{to{transform:translateY(-100%); visibility:hidden}}
+.load{width:min(640px,86vw); display:flex; flex-direction:column; align-items:center; text-align:center}
 .load-brand{font-family:var(--disp); font-weight:800; font-size:clamp(48px,6.4vw,64px); letter-spacing:-.015em; color:var(--on-panel); margin-bottom:58px}
 .load-brand b{color:var(--lb); font-weight:800}
 .load .rail-pipe{position:relative; width:100%; height:44px; margin-bottom:8px}
-.load .rail-pipe .track{position:absolute; left:0; right:0; top:50%; height:2px; transform:translateY(-50%); background:rgba(245,246,248,.14); border-radius:2px}
-.load .rail-pipe .fill{position:absolute; left:0; top:50%; height:2px; transform:translateY(-50%); width:0%; background:var(--lb); border-radius:2px; transition:width .18s linear}
-.load .node{position:absolute; top:50%; width:14px; height:14px; border-radius:50%; background:var(--ink); border:2px solid var(--dim); transform:translate(-50%,-50%); transition:all .3s var(--ease); z-index:2}
+.load .rail-pipe .track{position:absolute; left:0; right:0; top:50%; height:2px; transform:translateY(-50%); background:var(--on-panel-track); border-radius:2px}
+.load .rail-pipe .fill{position:absolute; left:0; right:0; top:calc(50% - 1px); height:2px; transform:scaleX(0); transform-origin:0 50%; background:var(--lb); border-radius:2px; transition:transform .18s linear}
+.load .node{position:absolute; top:50%; width:14px; height:14px; border-radius:50%; background:var(--ink); border:2px solid var(--dim); transform:translate(-50%,-50%); transition:background-color .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease); z-index:2}
 .load .node[data-i="0"]{left:0}
 .load .node[data-i="1"]{left:33.33%}
 .load .node[data-i="2"]{left:66.66%}
 .load .node[data-i="3"]{left:100%}
-.load .node.on{border-color:var(--lb); background:var(--lb); box-shadow:0 0 0 6px rgba(43,91,255,.16)}
-.load .node.ok{border-color:var(--ok); background:var(--ok); box-shadow:0 0 0 7px rgba(48,212,122,.16)}
+.load .node.on{border-color:var(--lb); background:var(--lb); box-shadow:0 0 0 6px var(--lb-glow)}
+.load .node.ok{border-color:var(--ok); background:var(--ok); box-shadow:0 0 0 7px var(--ok-glow)}
 .load .labels{position:relative; width:100%; height:18px; margin-bottom:52px}
 .load .lab{position:absolute; top:0; font-family:var(--disp); font-weight:600; font-size:11.5px; letter-spacing:.14em; color:var(--dim); transition:color .3s var(--ease); white-space:nowrap}
 .load .lab[data-i="0"]{left:0; transform:translateX(0)}
@@ -88,7 +106,8 @@ h1,h2,h3,h4,p{margin:0}
 .load .status.ok{color:var(--ok)}
 
 /* ===== 헤더 ===== */
-.top{position:fixed; top:0; left:0; right:0; z-index:60; display:flex; align-items:center; justify-content:space-between; height:68px; padding:0 var(--pad); opacity:0; transform:translateY(-8px); transition:opacity .6s var(--ease) .2s, transform .6s var(--ease) .2s}
+.top{position:fixed; top:0; left:0; right:0; z-index:60; display:flex; align-items:center; justify-content:space-between; height:68px; padding:0 var(--pad); transition:opacity .6s var(--ease) .2s, transform .6s var(--ease) .2s}
+.js .top{opacity:0; transform:translateY(-8px)}
 .ready .top{opacity:1; transform:none}
 .brand{font-family:var(--disp); font-weight:800; font-size:17px; letter-spacing:-.02em}
 .brand i{color:var(--blue); font-style:normal}
@@ -110,9 +129,17 @@ h1,h2,h3,h4,p{margin:0}
 .deck-inner{will-change:transform; transform:translate3d(0, calc(var(--i,0) * -100svh), 0); transition:transform .85s var(--ease)}
 .page{height:100svh; width:100%; display:flex; flex-direction:column; justify-content:center; padding:88px var(--pad) 64px; position:relative}
 .page-in{width:100%; max-width:var(--maxw); margin:0 auto}
+/* 스크립트가 꺼져 있으면 덱 대신 일반 스크롤로 모든 장과 두 프로젝트를 보여 준다 */
+html:not(.js) .deck{height:auto; overflow:visible}
+html:not(.js) .page{height:auto; min-height:100svh}
+html:not(.js) .top{background:var(--paper); box-shadow:0 1px 0 var(--line)}
+html:not(.js) .hint{display:none}
 
-/* 진입 모션 */
-.page .rise{opacity:0; transform:translateY(16px); transition:opacity .7s var(--ease), transform .7s var(--ease)}
+/* 진입 모션: 숨김 상태는 스크립트가 붙이는 .js 아래, 덱 화면에서만 */
+.page .rise{transition:opacity .7s var(--ease), transform .7s var(--ease)}
+@media (min-width:821px) and (prefers-reduced-motion:no-preference){
+  .js .page .rise{opacity:0; transform:translateY(16px)}
+}
 .page.is-active .rise{opacity:1; transform:none; transition-delay:.12s}
 .page.is-active .rise.d2{transition-delay:.20s}
 .page.is-active .rise.d3{transition-delay:.28s}
@@ -121,7 +148,7 @@ h1,h2,h3,h4,p{margin:0}
 /* ===== ① 인트로(이름·강점·사진) ===== */
 .hero-ghost{position:absolute; left:var(--pad); right:0; top:50%; transform:translateY(-54%); font-family:var(--disp); font-weight:800; letter-spacing:-.03em; line-height:.9; font-size:clamp(90px,20vw,280px); color:var(--mist); z-index:0; pointer-events:none; white-space:nowrap; overflow:hidden}
 .intro-page .page-in{position:relative; z-index:1}
-.intro-grid{display:grid; grid-template-columns:1.12fr .88fr; gap:clamp(32px,5vw,72px); align-items:center}
+.intro-grid{display:grid; grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr); gap:clamp(32px,5vw,72px); align-items:center}
 .intro-left .kick{font-family:var(--disp); font-weight:700; letter-spacing:.14em; font-size:13px; color:var(--blue); margin-bottom:14px}
 .intro-left h1{font-weight:800; letter-spacing:-.03em; line-height:.95; font-size:clamp(60px,10vw,140px)}
 .intro-left .strength{margin-top:22px; font-size:clamp(17px,2.1vw,25px); font-weight:700; letter-spacing:-.02em; line-height:1.4; max-width:24ch}
@@ -151,7 +178,7 @@ h1,h2,h3,h4,p{margin:0}
 .tl-item.todo::after{background:var(--line)}
 .tl-year{font-family:var(--disp); font-weight:800; font-size:21px; color:var(--ink)}
 .tl-role{font-weight:700; font-size:15px; margin-top:8px}
-.tl-desc{font-size:13px; color:var(--ink-3); margin-top:5px; line-height:1.5; max-width:22ch}
+.tl-desc{font-size:13px; color:var(--ink-2); margin-top:5px; line-height:1.5; max-width:22ch}
 .tl-win{font-size:12px; color:var(--blue); font-weight:600; margin-top:8px; line-height:1.5; max-width:22ch}
 .career .ph-note{margin-top:22px}
 
@@ -160,9 +187,9 @@ h1,h2,h3,h4,p{margin:0}
 .col-h{font-family:var(--disp); font-weight:700; font-size:12.5px; letter-spacing:.06em; color:var(--ink-3); margin-bottom:14px}
 .edu-card{border:1px solid var(--line); border-radius:14px; padding:20px; margin-bottom:12px}
 .edu-card .ec-k{font-family:var(--disp); font-weight:800; font-size:11px; letter-spacing:.05em; color:var(--blue)}
-.edu-card h4{margin-top:8px; font-size:17px; font-weight:800; letter-spacing:-.01em}
+.edu-card h3{margin-top:8px; font-size:17px; font-weight:800; letter-spacing:-.01em}
 .edu-card p{margin-top:8px; font-size:13.5px; color:var(--ink-2); line-height:1.6}
-.edu-card.cert h4{margin-top:8px; font-size:15px}
+.edu-card.cert h3{margin-top:8px; font-size:15px}
 .groups{display:grid; gap:20px}
 .g .gh{font-family:var(--disp); font-weight:700; font-size:12px; letter-spacing:.06em; color:var(--ink-3); margin-bottom:10px}
 .tags{display:flex; flex-wrap:wrap; gap:9px}
@@ -177,14 +204,19 @@ h1,h2,h3,h4,p{margin:0}
 .slide{display:none; flex-direction:column; height:100%; overflow:auto}
 .slide.on{display:flex; animation:fade .5s var(--ease)}
 @keyframes fade{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
-.slide .code{font-family:var(--disp); font-weight:800; letter-spacing:.02em; font-size:14px; color:var(--blue)}
+/* 스크립트가 없으면 탭 대신 두 프로젝트를 차례로 모두 보여 준다 */
+html:not(.js) .projects .shell{grid-template-columns:minmax(0,1fr); height:auto}
+html:not(.js) .slide{display:flex; height:auto; overflow:visible}
+html:not(.js) .slide + .slide{margin-top:32px; padding-top:32px; border-top:1px solid var(--on-panel-line)}
+html:not(.js) .tabs{display:none}
+.slide .code{font-family:var(--disp); font-weight:800; letter-spacing:.02em; font-size:14px; color:var(--blue-on-dark)}
 .slide h3{margin-top:12px; font-weight:800; letter-spacing:-.02em; font-size:clamp(24px,2.8vw,36px); line-height:1.1}
 .slide .meta{color:var(--on-panel-soft); font-size:14px; margin-top:6px}
 .slide .detail{margin-top:16px; color:var(--on-panel); font-size:14.5px; line-height:1.65; max-width:56ch}
 .slide .evlabel{font-family:var(--disp); font-weight:700; font-size:11px; letter-spacing:.09em; color:var(--on-panel-soft); margin-top:22px}
 .slide .feats{display:grid; gap:11px; margin-top:12px}
 .slide .feat{display:flex; gap:12px; align-items:flex-start}
-.slide .ok{flex:0 0 auto; margin-top:2px; font-family:var(--disp); font-weight:800; font-size:11px; letter-spacing:.04em; color:var(--ink); background:var(--blue); padding:3px 7px; border-radius:6px}
+.slide .ok{flex:0 0 auto; margin-top:2px; font-family:var(--disp); font-weight:800; font-size:11px; letter-spacing:.04em; color:var(--on-panel); background:var(--blue); padding:3px 7px; border-radius:6px}
 .slide .feat p{font-size:14px; line-height:1.5; color:var(--on-panel)}
 .slide .feat p span{color:var(--on-panel-soft)}
 .tabs{display:flex; flex-direction:column; gap:12px}
@@ -193,7 +225,7 @@ h1,h2,h3,h4,p{margin:0}
 .tab .tc{font-family:var(--disp); font-weight:800; font-size:12px; letter-spacing:.03em; color:var(--ink-3)}
 .tab .tt{font-weight:700; font-size:16px}
 .tab[aria-selected="true"]{background:var(--ink); border-color:var(--ink)}
-.tab[aria-selected="true"] .tc{color:var(--blue)}
+.tab[aria-selected="true"] .tc{color:var(--blue-on-dark)}
 .tab[aria-selected="true"] .tt{color:var(--paper)}
 
 /* ===== ⑥ 기타·관심사 ===== */
@@ -201,7 +233,7 @@ h1,h2,h3,h4,p{margin:0}
 .more-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
 .more-card{border:1px solid var(--line); border-radius:16px; padding:22px; min-height:158px; display:flex; flex-direction:column}
 .more-card .mc-k{font-family:var(--disp); font-weight:800; font-size:11px; letter-spacing:.04em; color:var(--blue)}
-.more-card h4{margin-top:10px; font-size:18px; font-weight:800; letter-spacing:-.01em}
+.more-card h3{margin-top:10px; font-size:18px; font-weight:800; letter-spacing:-.01em}
 .more-card p{margin-top:7px; font-size:13.5px; color:var(--ink-2); line-height:1.55}
 .more-card.add{border-style:dashed; align-items:center; justify-content:center; text-align:center; color:var(--ink-3)}
 .more-card.add .plus{font-family:var(--disp); font-weight:800; font-size:26px; line-height:1}
@@ -211,11 +243,14 @@ h1,h2,h3,h4,p{margin:0}
 /* ===== ⑦ 연락처 ===== */
 .contact{background:var(--ink); color:var(--on-panel)}
 .contact h2{font-weight:800; letter-spacing:-.025em; line-height:1.12; font-size:clamp(32px,5.2vw,70px)}
-.contact .mail{display:inline-block; margin-top:28px; font-family:var(--disp); font-weight:700; color:var(--blue); font-size:clamp(20px,3vw,34px); letter-spacing:-.01em}
+.contact .eyebrow{color:var(--on-panel-soft)}
+.contact .eyebrow .ln{background:var(--on-panel-line)}
+.contact .eyebrow b{color:var(--on-panel)}
+.contact .mail{display:inline-block; margin-top:28px; font-family:var(--disp); font-weight:700; color:var(--blue-on-dark); font-size:clamp(20px,3vw,34px); letter-spacing:-.01em}
 .contact .mail:hover{text-decoration:underline; text-underline-offset:6px}
 .contact .links{display:flex; flex-wrap:wrap; gap:26px; margin-top:32px; font-size:14.5px; color:var(--on-panel-soft)}
 .contact .links a{font-weight:600; color:var(--on-panel)}
-.contact .links a:hover{color:var(--blue)}
+.contact .links a:hover{color:var(--blue-on-dark)}
 .contact .foot{margin-top:52px; font-size:12.5px; color:var(--on-panel-soft)}
 
 /* ===== 본문 보강 스타일 ===== */
@@ -235,7 +270,8 @@ h1,h2,h3,h4,p{margin:0}
 .career .overlap{margin-top:16px; font-size:12.5px; color:var(--ink-3); font-weight:600; line-height:1.5; max-width:60ch}
 
 .slide .srcs{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
-.slide .src{font-family:var(--disp); font-weight:700; font-size:11px; letter-spacing:.02em; color:var(--on-panel-soft); border:1px solid rgba(245,246,248,.2); border-radius:999px; padding:5px 11px}
+.slide .src{font-family:var(--disp); font-weight:700; font-size:11px; letter-spacing:.02em; color:var(--on-panel-soft); border:1px solid var(--on-panel-line); border-radius:999px; padding:5px 11px}
+.slide .src.read{align-self:flex-start; margin-top:12px; color:var(--paper); border-color:var(--on-panel-line-strong); padding:8px 14px; font-size:13px}
 .slide a.src:hover{color:var(--on-panel); border-color:var(--on-panel-soft)}
 .slide .team{margin-top:16px; font-size:13px; color:var(--on-panel); line-height:1.6; border-left:2px solid var(--blue); padding-left:13px}
 .slide .team span{color:var(--on-panel-soft)}
@@ -243,27 +279,31 @@ h1,h2,h3,h4,p{margin:0}
 .slide .limit b{color:var(--on-panel); font-weight:700}
 /* 흐름도: 단계 사이를 꺾쇠로 잇는다(좁은 화면에서는 세로) */
 .slide .flow{list-style:none; margin:14px 0 0; padding:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:20px}
-.slide .flow li{position:relative; border:1px solid rgba(245,246,248,.2); border-radius:10px; padding:9px 11px 10px; font-size:12.5px; line-height:1.45; color:var(--on-panel-soft)}
+.slide .flow li{position:relative; border:1px solid var(--on-panel-line); border-radius:10px; padding:9px 11px 10px; font-size:12.5px; line-height:1.45; color:var(--on-panel-soft)}
 .slide .flow li b{display:block; margin-bottom:3px; font-size:13px; font-weight:700; color:var(--on-panel)}
-.slide .flow li.end{border-color:rgba(245,246,248,.5)}
+.slide .flow li.end{border-color:var(--on-panel-line-strong)}
 .slide .flow li + li::before{content:""; position:absolute; left:-15px; top:50%; width:8px; height:8px; border-top:1.5px solid var(--on-panel-soft); border-right:1.5px solid var(--on-panel-soft); transform:translateY(-50%) rotate(45deg)}
 .slide .feats + .flow{margin-top:10px}
 
 @media (max-width:820px){ .values .vg{grid-template-columns:1fr} }
 
 /* ===== 네비 레일 ===== */
-.rail{position:fixed; right:22px; top:50%; transform:translateY(-50%); z-index:60; display:flex; flex-direction:column; gap:14px; align-items:flex-end; opacity:0; transition:opacity .5s var(--ease) .3s}
+.rail{position:fixed; right:22px; top:50%; transform:translateY(-50%); z-index:60; display:flex; flex-direction:column; gap:14px; align-items:flex-end; transition:opacity .5s var(--ease) .3s}
+.js .rail{opacity:0}
 .ready .rail{opacity:1}
 .rail button{display:flex; align-items:center; gap:10px; background:none; border:0; cursor:pointer; padding:4px 0; font-family:var(--disp); font-weight:700; font-size:11px; letter-spacing:.06em; color:var(--ink-3)}
-.rail button .t{opacity:0; transform:translateX(6px); transition:opacity .2s var(--ease), transform .2s var(--ease); background:var(--paper); padding:2px 5px; border-radius:4px}
-.rail button:hover .t{opacity:1; transform:none}
-.rail button .bar{width:26px; height:2px; background:var(--line); transition:background .2s var(--ease), width .2s var(--ease)}
-.rail button[aria-current="true"] .bar{background:var(--blue); width:40px}
+.rail button .t{transition:opacity .2s var(--ease), transform .2s var(--ease); background:var(--paper); padding:2px 5px; border-radius:4px}
+.js .rail button .t{opacity:0; transform:translateX(6px)}
+.js .rail button:hover .t,.js .rail button:focus-visible .t{opacity:1; transform:none}
+/* 막대 길이는 width 대신 scaleX로 바꾼다(26px ↔ 40px) */
+.rail button .bar{width:40px; height:2px; background:var(--line); transform:scaleX(.65); transform-origin:100% 50%; transition:background-color .2s var(--ease), transform .2s var(--ease)}
+.rail button[aria-current="true"] .bar{background:var(--blue); transform:none}
 .rail button[aria-current="true"]{color:var(--ink)}
 @media (max-width:720px){ .rail{display:none} }
 
 /* 하단 힌트 */
-.hint{position:fixed; left:50%; bottom:20px; transform:translateX(-50%); z-index:55; font-family:var(--disp); font-weight:600; font-size:11px; letter-spacing:.14em; color:var(--ink-3); display:flex; align-items:center; gap:9px; opacity:0; transition:opacity .5s var(--ease) .4s}
+.hint{position:fixed; left:50%; bottom:20px; transform:translateX(-50%); z-index:55; font-family:var(--disp); font-weight:600; font-size:11px; letter-spacing:.14em; color:var(--ink-3); display:flex; align-items:center; gap:9px; transition:opacity .5s var(--ease) .4s}
+.js .hint{opacity:0}
 .ready .hint{opacity:1}
 .hint .m{width:16px; height:26px; border:1.5px solid var(--ink-3); border-radius:9px; position:relative}
 .hint .m::after{content:""; position:absolute; left:50%; top:5px; width:2px; height:5px; background:var(--ink-3); border-radius:2px; transform:translateX(-50%); animation:wheel 1.5s var(--ease) infinite}
@@ -276,15 +316,24 @@ h1,h2,h3,h4,p{margin:0}
   .deck{height:auto; overflow:visible}
   .deck-inner{transform:none !important; transition:none}
   .page{height:auto; min-height:100svh; padding:96px var(--pad) 72px}
+  /* 일반 스크롤에서는 고정 헤더가 본문 위에 겹치므로 흰 배경을 깐다 */
+  .top{background:var(--paper); box-shadow:0 1px 0 var(--line)}
   .hero-ghost{font-size:clamp(64px,24vw,140px)}
-  .intro-grid{grid-template-columns:1fr; gap:34px}
+  .intro-grid{grid-template-columns:minmax(0,1fr); gap:34px}
   .intro-photo .frame,.intro-photo .photo{max-width:300px}
+  /* 경력은 옆으로 밀지 않고 위에서 아래로 모두 보이게 세운다 */
+  .timeline{flex-direction:column; overflow:visible; padding-bottom:0}
+  .tl-item{flex:none; padding:0 0 24px 28px}
+  .tl-item:last-child{padding-bottom:0}
+  .tl-item::before{top:8px; bottom:-8px; left:5px; right:auto; width:2px; height:auto}
+  .tl-item:last-child::before{display:none}
+  .tl-item::after{top:2px}
+  .tl-desc,.tl-win{max-width:44ch}
   .skills .edu-grid{grid-template-columns:1fr; gap:30px}
   .projects .shell{grid-template-columns:1fr; height:auto; gap:16px}
   .tabs{flex-direction:row; flex-wrap:wrap}
   .tab{flex:1 1 44%}
   .more-grid{grid-template-columns:1fr 1fr}
-  .page .rise{opacity:1; transform:none}
   .about2 h2 .w{opacity:1}
 }
 @media (max-width:520px){ .more-grid{grid-template-columns:1fr} }
@@ -294,7 +343,6 @@ h1,h2,h3,h4,p{margin:0}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001ms !important; transition-duration:.001ms !important}
-  .page .rise{opacity:1; transform:none}
   .about2 h2 .w{opacity:1}
 }
 </style>
@@ -326,14 +374,14 @@ h1,h2,h3,h4,p{margin:0}
 
 <!-- 헤더 -->
 <header class="top">
-  <a class="brand" href="#" aria-label="이드's Lab 홈">이드's<i>Lab.</i></a>
+  <a class="brand" href="#home" data-go="0" aria-label="이드's Lab 홈">이드's<i>Lab.</i></a>
   <nav>
     <span class="nav-links">
-      <a href="#" data-go="2">소개</a>
-      <a href="#" data-go="3">경력</a>
-      <a href="#" data-go="5">프로젝트</a>
+      <a href="#about" data-go="2">소개</a>
+      <a href="#career" data-go="3">경력</a>
+      <a href="#work" data-go="5">프로젝트</a>
     </span>
-    <a class="pill" href="https://github.com/Es-0625" target="_blank" rel="noopener">GitHub ↗</a>
+    <a class="pill" href="https://github.com/Es-0625" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
   </nav>
 </header>
 
@@ -342,7 +390,7 @@ h1,h2,h3,h4,p{margin:0}
   <div class="deck-inner" id="deckInner">
 
     <!-- ① 인트로: 이름·대표문장·사진 -->
-    <section class="page intro-page is-active" data-name="HOME">
+    <section class="page intro-page is-active" id="home" data-name="HOME">
       <div class="hero-ghost" aria-hidden="true">SHIP &amp; VERIFY</div>
       <div class="page-in">
         <div class="intro-grid">
@@ -352,8 +400,8 @@ h1,h2,h3,h4,p{margin:0}
             <p class="strength rise d2">전체를 보고, 근거로 설계하며, 원인까지 확인합니다.</p>
             <p class="intro-sub rise d3">서비스의 요구사항에서 출발해, 그에 맞는 아키텍처를 설계하고 구축하는 법을 배워 왔습니다. 어떤 기술을 왜 선택하고 어떻게 연결할지 고민하며 꾸준히 배우고 확인합니다. 선택의 이유뿐 아니라 그 한계를 알고, 보완점까지 고려하는 엔지니어를 지향합니다.</p>
             <div class="cta rise d4">
-              <a class="btn solid" href="#" data-go="5">프로젝트 보기
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              <a class="btn solid" href="#work" data-go="5">프로젝트 보기
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
               </a>
               <a class="btn ghost" href="mailto:aa3181@gmail.com">연락하기</a>
             </div>
@@ -366,7 +414,7 @@ h1,h2,h3,h4,p{margin:0}
     </section>
 
     <!-- 강점: 제가 일하는 방식 -->
-    <section class="page values" data-name="STRENGTH">
+    <section class="page values" id="strength" data-name="STRENGTH">
       <div class="page-in">
         <div class="eyebrow rise"><span class="ln"></span><b>01</b> 강점</div>
         <h2 class="sec-h rise d2">제가 일하는 방식.</h2>
@@ -380,7 +428,7 @@ h1,h2,h3,h4,p{margin:0}
     </section>
 
     <!-- ② 소개 -->
-    <section class="page about2" data-name="ABOUT">
+    <section class="page about2" id="about" data-name="ABOUT">
       <div class="page-in">
         <div class="eyebrow rise"><span class="ln"></span><b>02</b> 소개</div>
         <h2 class="rise d2"><span data-reveal>목장과 유가공 사업, 교환·반품센터 운영을 거쳐 클라우드 엔지니어로 새로운 경력을 준비하고 있습니다.</span></h2>
@@ -390,7 +438,7 @@ h1,h2,h3,h4,p{margin:0}
     </section>
 
     <!-- ③ 간단 경력 (가로 타임라인) -->
-    <section class="page career" data-name="CAREER">
+    <section class="page career" id="career" data-name="CAREER">
       <div class="page-in">
         <div class="eyebrow rise"><span class="ln"></span><b>03</b> 간단 경력</div>
         <h2 class="sec-h rise d2">연도별로 걸어온 길.</h2>
@@ -406,25 +454,25 @@ h1,h2,h3,h4,p{margin:0}
     </section>
 
     <!-- ④ 기술 · 교육 -->
-    <section class="page skills" data-name="SKILLS">
+    <section class="page skills" id="skills" data-name="SKILLS">
       <div class="page-in">
-        <div class="eyebrow rise"><span class="ln"></span><b>04</b> 기술 · 교육</div>
+        <h2 class="eyebrow rise"><span class="ln"></span><b>04</b> 기술 · 교육</h2>
         <div class="edu-grid rise d2">
           <div class="col">
             <div class="col-h">교육 · 자격</div>
             <div class="edu-card">
               <div class="ec-k">BOOTCAMP</div>
-              <h4>베스핀글로벌 멀티클라우드 엔지니어 부트캠프</h4>
+              <h3>베스핀글로벌 멀티클라우드 엔지니어 부트캠프</h3>
               <p>AWS · Azure · GCP · NCP 기본 서비스와 서버·네트워크·DB부터 Docker · Kubernetes · Terraform · CI/CD · 모니터링까지 학습. 두 차례 팀 프로젝트에 적용. 2026.04 – 2026.10 수료.</p>
             </div>
             <div class="edu-card">
               <div class="ec-k">ETC</div>
-              <h4>SBS아카데미 Unity 게임개발</h4>
+              <h3>SBS아카데미 Unity 게임개발</h3>
               <p>Unity 엔진과 C# 중심의 게임개발 기초. 드래곤플라이트 · 메탈슬러그 모작 제작. 2019.09 – 2020.02(6개월) 수료.</p>
             </div>
             <div class="edu-card cert">
               <div class="ec-k">CERT</div>
-              <h4>AZ-900 · Microsoft Azure Fundamentals</h4>
+              <h3>AZ-900 · Microsoft Azure Fundamentals</h3>
               <p>2026.10.08 취득</p>
             </div>
           </div>
@@ -444,16 +492,16 @@ h1,h2,h3,h4,p{margin:0}
     </section>
 
     <!-- ⑤ 대표 프로젝트 -->
-    <section class="page projects" data-name="WORK">
+    <section class="page projects" id="work" data-name="WORK">
       <div class="page-in">
-        <div class="eyebrow rise"><span class="ln"></span><b>05</b> 대표 프로젝트</div>
+        <h2 class="eyebrow rise"><span class="ln"></span><b>05</b> 대표 프로젝트</h2>
         <div class="shell rise d2">
           <div class="panel">
             <article class="slide on" id="p0">
               <div class="code">중간 프로젝트 · 3-TIER</div>
               <h3>Spring PetClinic · AWS 3계층 웹 서비스</h3>
               <div class="meta">2026.06.30 – 07.13 · 팀 AWSome 5명 · AWS 3계층(Web · WAS · DB)</div>
-              <a class="src" href="projects/petclinic.html" style="align-self:flex-start;margin-top:12px;color:#fff;border:1px solid rgba(245,246,248,.5);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700">프로젝트 기록 자세히 읽기 ↗</a>
+              <a class="src read" href="projects/petclinic.html">프로젝트 기록 자세히 읽기 <span aria-hidden="true">↗</span></a>
               <p class="detail">Web · WAS · DB의 역할을 분리한 AWS 환경에 Spring PetClinic을 배포하고, 부하 변화와 일부 서버 장애에 대응하는 서비스를 구성했습니다. 저는 서비스 리소스(Web/WAS)를 맡아 Apache · Tomcat 구성과 PetClinic 배포·연결, 메모리 부족 대응을 담당했습니다. <span style="opacity:.7">(사용자 → 외부 ALB → Apache → 내부 ALB → Tomcat · PetClinic → Aurora)</span></p>
               <div class="evlabel">내 역할 · 검증 근거</div>
               <div class="feats">
@@ -474,7 +522,7 @@ h1,h2,h3,h4,p{margin:0}
               <div class="code">최종 프로젝트 · CI/CD · DR</div>
               <h3>Retail Store · AWS 운영 &amp; GCP 재해복구</h3>
               <div class="meta">2026.08 – 10 · 팀 AWSome 5명</div>
-              <a class="src" href="projects/retail-store.html" style="align-self:flex-start;margin-top:12px;color:#fff;border:1px solid rgba(245,246,248,.5);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700">프로젝트 기록 자세히 읽기 ↗</a>
+              <a class="src read" href="projects/retail-store.html">프로젝트 기록 자세히 읽기 <span aria-hidden="true">↗</span></a>
               <p class="detail">AWS(EKS · RDS)에서 쇼핑몰을 운영하고 완료 주문을 GCP(GKE · Cloud SQL)에 복제해, 장애 시 승인 후 전환하는 환경을 구성했습니다. CI/CD(이미지 빌드·게시, AWS Argo CD 수동 Sync)와 함께, AWS 리전 장애에 대비한 GCP 재해복구(DR) PoC를 맡아 복구 환경 구성과 전환 검증을 담당했습니다.</p>
               <ol class="flow" aria-label="AWS 운영에서 GCP 재해복구로 전환하는 흐름">
                 <li><b>AWS 운영</b>EKS · RDS에서 쇼핑몰 운영</li>
@@ -492,8 +540,8 @@ h1,h2,h3,h4,p{margin:0}
               <div class="team"><b>팀 검증</b> — 최대 100 VU 혼합 부하(HTTP 79,282건 · 실패 0 · p95 71.50ms, 주문 20/20), 승인 후 GCP 전환 200.601초 관측. <span>※ 300명은 목표(미실시), 일부 검사 실패 존재, 200.601초는 관측값으로 공식 RTO 아님</span></div>
               <div class="limit"><b>한계 · 보완</b> — NetworkPolicy는 작성했으나 미적용·미시험, RDS Multi-AZ · 백업 Restore 미수행. 30일 교대 계정 · Blue/Green은 후속 설계. GCP 최종 배포 도구를 Argo CD로 단정하지 않습니다.</div>
               <div class="srcs">
-                <a class="src" href="https://github.com/AWSome-BIT-Bespin/retail-store-app" target="_blank" rel="noopener">GitHub · app ↗</a>
-                <a class="src" href="https://github.com/AWSome-BIT-Bespin/retail-store-gitops" target="_blank" rel="noopener">GitHub · gitops ↗</a>
+                <a class="src" href="https://github.com/AWSome-BIT-Bespin/retail-store-app" target="_blank" rel="noopener">GitHub · app <span aria-hidden="true">↗</span></a>
+                <a class="src" href="https://github.com/AWSome-BIT-Bespin/retail-store-gitops" target="_blank" rel="noopener">GitHub · gitops <span aria-hidden="true">↗</span></a>
               </div>
             </article>
           </div>
@@ -506,25 +554,25 @@ h1,h2,h3,h4,p{margin:0}
     </section>
 
     <!-- ⑥ 기타 프로젝트 · 관심사 -->
-    <section class="page more" data-name="MORE">
+    <section class="page more" id="more" data-name="MORE">
       <div class="page-in">
         <div class="eyebrow rise"><span class="ln"></span><b>06</b> 기타 프로젝트 · 관심사</div>
         <h2 class="sec-h rise d2">그 외에 만들고, 파고드는 것들.</h2>
         <div class="more-grid rise d3">
-          <div class="more-card"><div class="mc-k">AI</div><h4>AI 활용</h4><p>최종 프로젝트에서 평일 오전 AI 예약 브리핑으로 진행 상황·당일 할 일을 파악(2026.09–10). 반복 자료 정리에 AI 활용을 탐색 중.</p></div>
-          <div class="more-card"><div class="mc-k">INTEREST</div><h4>에이전트 관심사</h4><p>자료 탐색·작업 분담·결과 확인 흐름에 관심. 시도와 한계를 학습 기록으로 남기는 중.</p></div>
-          <div class="more-card"><div class="mc-k">WEB</div><h4>페이코맵</h4><p>지도·위치 정보를 다루는 웹 프로젝트.</p></div>
-          <div class="more-card"><div class="mc-k">GAME</div><h4>총알피하기</h4><p>게임 루프·충돌 판정·점수 계산을 다룬 Canvas 웹 게임.</p></div>
-          <div class="more-card"><div class="mc-k">APP</div><h4>DesktopPet · QuizBank</h4><p>WinUI 3 데스크톱 펫, 문제은행 앱.</p></div>
-          <div class="more-card"><div class="mc-k">LAB</div><h4>Azure Practice Lab</h4><p>Azure VM · Application Gateway · VMSS 웹 서버 배포 실습 기록.</p></div>
+          <div class="more-card"><div class="mc-k">AI</div><h3>AI 활용</h3><p>최종 프로젝트에서 평일 오전 AI 예약 브리핑으로 진행 상황·당일 할 일을 파악(2026.09–10). 반복 자료 정리에 AI 활용을 탐색 중.</p></div>
+          <div class="more-card"><div class="mc-k">INTEREST</div><h3>에이전트 관심사</h3><p>자료 탐색·작업 분담·결과 확인 흐름에 관심. 시도와 한계를 학습 기록으로 남기는 중.</p></div>
+          <div class="more-card"><div class="mc-k">WEB</div><h3>페이코맵</h3><p>지도·위치 정보를 다루는 웹 프로젝트.</p></div>
+          <div class="more-card"><div class="mc-k">GAME</div><h3>총알피하기</h3><p>게임 루프·충돌 판정·점수 계산을 다룬 Canvas 웹 게임.</p></div>
+          <div class="more-card"><div class="mc-k">APP</div><h3>DesktopPet · QuizBank</h3><p>WinUI 3 데스크톱 펫, 문제은행 앱.</p></div>
+          <div class="more-card"><div class="mc-k">LAB</div><h3>Azure Practice Lab</h3><p>Azure VM · Application Gateway · VMSS 웹 서버 배포 실습 기록.</p></div>
         </div>
       </div>
     </section>
 
     <!-- ⑦ 연락처 -->
-    <section class="page contact" data-name="CONTACT" data-theme="dark">
+    <section class="page contact" id="contact" data-name="CONTACT" data-theme="dark">
       <div class="page-in">
-        <div class="eyebrow rise" style="color:var(--on-panel-soft)"><span class="ln" style="background:rgba(245,246,248,.2)"></span><b style="color:var(--on-panel)">07</b> 연락처</div>
+        <div class="eyebrow rise"><span class="ln"></span><b>07</b> 연락처</div>
         <h2 class="rise d2">클라우드 엔지니어로<br />함께할 기회를<br />기다립니다.</h2>
         <a class="mail rise d3" href="mailto:aa3181@gmail.com">aa3181@gmail.com</a>
         <div class="links rise d3">
@@ -600,6 +648,19 @@ h1,h2,h3,h4,p{margin:0}
   window.__go = go;
 
   deckInner.addEventListener('transitionend', function(e){ if(e.propertyName==='transform') animating=false; });
+
+  /* 주소가 #work처럼 장 id를 가리키면 덱 안을 스크롤하지 않고 그 장으로 넘긴다 */
+  var deckEl = document.getElementById('deck');
+  function fromHash(){
+    if(!deckMode()) return;
+    var i = -1;
+    pages.forEach(function(p, k){ if(p.id && '#' + p.id === location.hash) i = k; });
+    if(i < 0) return;
+    deckEl.scrollTop = 0;
+    go(i);
+  }
+  window.addEventListener('load', fromHash);
+  window.addEventListener('hashchange', fromHash);
 
   window.addEventListener('wheel', function(e){
     if(!deckMode()) return;
@@ -680,7 +741,7 @@ h1,h2,h3,h4,p{margin:0}
   }
 
   function paintLoad(p){
-    fill.style.width = p + '%';
+    fill.style.transform = 'scaleX(' + (p / 100) + ')';
     pctEl.textContent = p;
     var cur = 0;
     for(var g=0; g<gates.length; g++){ if(p>=gates[g].at) cur=g; }
