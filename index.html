@@ -204,8 +204,9 @@ ul.tl-desc li + li{margin-top:2px}
 .skills .ph-note{margin-top:16px}
 
 /* ===== ⑤ 대표 프로젝트 ===== */
-.projects .shell{display:grid; grid-template-columns:1fr 290px; gap:22px; height:clamp(480px,80svh,660px)}
-.panel{background:var(--panel); color:var(--on-panel); border-radius:20px; padding:clamp(26px,3.2vw,42px); position:relative; overflow:hidden; display:flex; flex-direction:column}
+/* 프로젝트 선택 탭은 위, 내용 칸은 그 아래 남은 높이를 채운다 */
+.projects .shell{display:flex; flex-direction:column; gap:14px; height:clamp(480px,80svh,660px)}
+.panel{background:var(--panel); color:var(--on-panel); border-radius:20px; padding:clamp(26px,3.2vw,42px); position:relative; overflow:hidden; display:flex; flex-direction:column; flex:1; min-height:0}
 .slide{display:none; flex-direction:column; height:100%; overflow:auto}
 .slide.on{display:flex; animation:fade .5s var(--ease)}
 @keyframes fade{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
@@ -224,9 +225,9 @@ html:not(.js) .tabs{display:none}
 .slide .ok{flex:0 0 auto; margin-top:2px; font-family:var(--disp); font-weight:800; font-size:11px; letter-spacing:.04em; color:var(--on-panel); background:var(--blue); padding:3px 7px; border-radius:6px}
 .slide .feat p{font-size:14px; line-height:1.5; color:var(--on-panel)}
 .slide .feat p span{color:var(--on-panel-soft)}
-.tabs{display:flex; flex-direction:column; gap:12px}
-.tab{text-align:left; cursor:pointer; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:18px 20px; transition:border-color .2s var(--ease), background .2s var(--ease), transform .2s var(--ease); display:flex; flex-direction:column; gap:4px; flex:1}
-.tab:hover{transform:translateX(3px); border-color:var(--ink-3)}
+.tabs{display:flex; gap:12px; flex:none}
+.tab{text-align:left; cursor:pointer; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:14px 20px; transition:border-color .2s var(--ease), background .2s var(--ease), transform .2s var(--ease); display:flex; flex-direction:column; gap:4px; flex:1 1 0; min-width:0}
+.tab:hover{transform:translateY(-2px); border-color:var(--ink-3)}
 .tab .tc{font-family:var(--disp); font-weight:800; font-size:12px; letter-spacing:.03em; color:var(--ink-3)}
 .tab .tt{font-weight:700; font-size:16px}
 .tab[aria-selected="true"]{background:var(--ink); border-color:var(--ink)}
@@ -341,9 +342,8 @@ html:not(.js) .tabs{display:none}
   .tl-item::after{top:2px}
   .tl-desc,.tl-win{max-width:44ch}
   .skills .edu-grid{grid-template-columns:1fr; gap:30px}
-  .projects .shell{grid-template-columns:1fr; height:auto; gap:16px}
-  .tabs{flex-direction:row; flex-wrap:wrap}
-  .tab{flex:1 1 44%}
+  .projects .shell{height:auto; gap:12px}
+  .tab{padding:12px 14px}
   .more-grid{grid-template-columns:1fr 1fr}
   .about2 h2 .w{opacity:1}
 }
@@ -514,6 +514,10 @@ html:not(.js) .tabs{display:none}
       <div class="page-in">
         <h2 class="eyebrow rise"><span class="ln"></span><b>05</b> 대표 프로젝트</h2>
         <div class="shell rise d2">
+          <div class="tabs" role="tablist" aria-label="대표 프로젝트">
+            <button class="tab" role="tab" aria-selected="true" aria-controls="p0" data-i="0"><span class="tc">중간 프로젝트</span><span class="tt">PetClinic 3계층</span></button>
+            <button class="tab" role="tab" aria-selected="false" aria-controls="p1" data-i="1"><span class="tc">최종 프로젝트</span><span class="tt">Retail · CI/CD · DR</span></button>
+          </div>
           <div class="panel">
             <article class="slide on" id="p0">
               <div class="code">중간 프로젝트 · 3-TIER</div>
@@ -575,10 +579,6 @@ html:not(.js) .tabs{display:none}
                 <a class="src" href="https://github.com/AWSome-BIT-Bespin/retail-store-gitops" target="_blank" rel="noopener">GitHub · gitops <span aria-hidden="true">↗</span></a>
               </div>
             </article>
-          </div>
-          <div class="tabs" role="tablist" aria-label="대표 프로젝트">
-            <button class="tab" role="tab" aria-selected="true" aria-controls="p0" data-i="0"><span class="tc">중간 프로젝트</span><span class="tt">PetClinic 3계층</span></button>
-            <button class="tab" role="tab" aria-selected="false" aria-controls="p1" data-i="1"><span class="tc">최종 프로젝트</span><span class="tt">Retail · CI/CD · DR</span></button>
           </div>
         </div>
       </div>
