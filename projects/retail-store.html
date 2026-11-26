@@ -1,16 +1,183 @@
 <!DOCTYPE html>
-<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ON MART · 멀티클라우드 CI/CD와 DR — 이드's Lab 프로젝트 기록</title><meta name="description" content="AWS EKS 기반 Retail Store를 주 운영 환경으로 두고, GCP GKE·Cloud SQL을 재해복구 환경으로 연결한 팀 프로젝트입니다. 저는 CI/CD와 GCP 재해복구(DR) PoC를 맡아, 이미지 게시부터 GitOps 입력, Argo CD 반영, 실행 이미지 확인까지 이어지는 경로를 구성하고, 승인 후 GCP로 전환하는 복구 흐름을 검증했습니다."><link rel="stylesheet" href="project.css"></head>
-<body><a class="skip" href="#content">본문으로 건너뛰기</a><header><nav class="nav" aria-label="주요 메뉴"><a class="brand" href="../index.html">이드's<b>Lab.</b></a><a href="../index.html">포트폴리오로 돌아가기 <span aria-hidden="true">↗</span></a></nav></header>
-<div class="wrap"><div class="hero"><p class="eyebrow">PROJECT LOG / 02 · FINAL</p><h1>ON MART<br>멀티클라우드 CI/CD와 DR</h1><p class="lead">AWS EKS 기반 Retail Store를 주 운영 환경으로 두고, GCP GKE·Cloud SQL을 재해복구 환경으로 연결한 팀 프로젝트입니다. 저는 CI/CD와 GCP 재해복구(DR) PoC를 맡아, 이미지 게시부터 GitOps 입력, Argo CD 반영, 실행 이미지 확인까지 이어지는 경로를 구성하고, 승인 후 GCP로 전환하는 복구 흐름을 검증했습니다.</p><div class="meta"><span>최종 프로젝트</span><span>2026.08–10</span><span>AWSome · 5명 팀</span><span>CI/CD · DR PoC 담당</span></div><p class="reading-note">교육 팀 프로젝트 · 개인 기여와 팀 결과를 구분한 기록</p></div>
-<div class="layout"><aside class="toc"><strong>CONTENTS</strong><nav aria-label="목차"><a href="#overview">01 배경과 목표</a><a href="#architecture">02 시스템과 저장소</a><a href="#role">03 나의 담당 영역</a><a href="#implementation">04 릴리스 구현 과정</a><a href="#troubleshooting">05 문제 해결 기록</a><a href="#validation">06 팀 검증 결과</a><a href="#reflection">07 회고와 개선 방향</a><a href="#sources">08 기록과 근거</a></nav></aside><main id="content"><section id="overview"><span class="section-num">01</span><h2>배경과 목표</h2><p>애플리케이션을 배포하는 것에서 더 나아가, 어떤 소스가 어떤 이미지가 되어 어느 환경에서 실행되고 있는지 설명할 수 있는 운영 흐름을 만들고자 했습니다. 팀은 완료 주문의 보호를 우선하는 DR 구조를 설계했습니다. 최종 목표는 RTO 120분, Orders RPO 1분, 연간 가용성 99.7%였으며 목표값과 실제 시험에서 확인한 범위는 별도로 관리했습니다.</p></section><section id="architecture"><span class="section-num">02</span><h2>시스템과 저장소</h2><div class="architecture"><pre>App 저장소 → 이미지 CI → ECR · GAR
-                           ↓
-             GitOps 배포 버전 / 환경 values
-                           ↓
-           AWS Argo CD 수동 Sync → Pod 확인
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ON MART · AWS 운영과 GCP 재해복구 — 이드's Lab 프로젝트 기록</title>
+<meta name="description" content="쇼핑몰의 구매 흐름을 AWS(EKS · RDS)에서 운영하고, 완료 주문을 GCP Cloud SQL에 복제해 장애 시 승인 후 GCP로 전환하는 환경을 구축한 5명 팀 프로젝트입니다. 팀 리딩과 CI/CD, GCP 재해복구(DR) PoC를 맡았습니다.">
+<link rel="stylesheet" href="project.css">
+</head>
+<body>
+<a class="skip" href="#content">본문으로 건너뛰기</a>
+<header><nav class="nav" aria-label="주요 메뉴"><a class="brand" href="../index.html">이드's<b>Lab.</b></a><a href="../index.html">포트폴리오로 돌아가기 <span aria-hidden="true">↗</span></a></nav></header>
 
-주 운영 환경: AWS EKS · RDS PostgreSQL
-DR 환경: GCP GKE · Cloud SQL</pre></div><p>서비스는 UI·Catalog·Cart·Checkout·Orders의 5개 구성요소로 나뉩니다. AWS EKS와 RDS PostgreSQL을 주 환경으로 사용하고, GCP GKE·Cloud SQL로 주문 데이터와 서비스 전환을 준비했습니다.</p>
-<ul><li>App 저장소: 애플리케이션 소스, Dockerfile, 이미지 CI와 서비스 버전</li><li>Infra 저장소: Terraform·Terragrunt, 클러스터·IAM·환경 입력</li><li>GitOps 저장소: Helm 차트, 환경별 values, 배포 버전, Argo Application과 운영 절차</li></ul></section><section id="role"><span class="section-num">03</span><h2>나의 담당 영역</h2><p>CI/CD에서는 서비스별 빌드·게시 조건, AWS OIDC 인증 진단, Helm 렌더 검사, AWS/GCP 설정 입력 검증, Argo CD 설치·배포 연결과 릴리스 인계 문서를 중심으로 작업했습니다. namespace·ServiceAccount·Secret·서비스 연결을 함께 검사해, 각 담당자가 만든 구성요소가 배포 단계에서 맞물리도록 했습니다.</p><p>AWS 리전 장애에 대비한 GCP 재해복구(DR) PoC도 맡았습니다. GKE 복구 환경에 서비스를 배포하고, Cloud DMS로 RDS의 주문 데이터를 Cloud SQL에 복제하도록 구성했습니다. 장애 시에는 Slack 알림 후 담당자 승인을 거쳐 DB 승격과 DNS 변경이 실행되도록 했고, AWS를 중단한 상태에서 전환한 뒤 서비스 요청이 정상 처리되는 것을 확인했습니다.</p><p>DMS 접속정보 갱신처럼 DB 복제 구성 중 다른 팀원이 맡은 작업, 전체 인프라와 APM 계측은 개인 성과에 포함하지 않습니다. DR 시험의 전환 시간 측정은 06 팀 검증 결과에 따로 적었습니다.</p></section><section id="implementation"><span class="section-num">04</span><h2>릴리스 구현 과정</h2><h3>구현 1. 한 번 빌드한 이미지의 게시와 추적</h3><p>App 변경과 버전 입력을 바탕으로 대상 서비스 이미지를 빌드하고 ECR·GAR에 게시하는 흐름을 구성했습니다. 게시 성공 여부만 보지 않고 서비스별 태그, 소스 SHA, Actions 실행, digest를 함께 인계했습니다. 두 클라우드에서 사용할 이미지의 내용이 같은지 추적할 수 있도록 한 것입니다.</p><h3>구현 2. GitOps 입력과 정적 검증</h3><p>GitOps에서 환경 values와 서비스 버전 입력을 관리하고 Helm 렌더 결과를 검사했습니다. AWS/GCP의 namespace, Secret 참조, Service 연결과 같은 계약을 배포 전에 확인했습니다. 로컬 검사 통과와 GitHub CI 실행 결과를 구분했고, 정적 검사 성공을 실제 GCP 배포 성공으로 바꾸어 기록하지 않았습니다.</p><h3>구현 3. 수동 Sync와 배포 후 확인</h3><p>이미지 게시 이후 GitOps 버전 변경과 Argo CD 수동 Sync를 거쳐 배포하도록 연결했습니다. 이미지 자동 업데이트·GitOps 자동 PR·자동 Sync까지 구현한 완전 자동 배포는 아닙니다. 배포 시에는 대상 revision과 상태를 확인하고, 실행 중인 Pod imageID를 게시된 digest와 대조했습니다.</p>
-<p>대표 사례인 9월 30일 UI v0.1.8 배포에서는 소스 SHA → Actions → ECR·GAR digest → GitOps PR → Argo revision → Pod imageID → 화면 배지를 연결한 기록을 남겼습니다.</p></section><section id="troubleshooting"><span class="section-num">05</span><h2>문제 해결 기록</h2><h3>문제 해결 1. 배포 이름과 selector 불일치</h3><p>GitOps의 Application·releaseName과 실제 설치된 Helm release 이름이 달랐습니다. namespace만 맞추면 된다고 가정하지 않고 Deployment selector·Service 대상·소유권 연결을 함께 확인했습니다. PR #9에서 이름을 retail-store로 정합화하고 후속 배포 기록으로 연결했습니다.</p><h3>문제 해결 2. Sync 후 사라진 관측 도구 배치 조건</h3><p>실제 클러스터에만 남아 있던 WhaTap의 MGMT 배치 조건이 Sync 이후 사라지는 문제를 확인했습니다. PR #11에 nodeSelector·toleration을 AWS values로 반영해 선언적 원본에 보존했습니다. 후속 Sync에서는 master가 MGMT에서 Running이고 node agent 4개가 APP·MGMT 노드에 Running인 상태를 확인했습니다. 관측 설계 전체가 아니라 배포 조건의 보존·통합 작업입니다.</p><h3>문제 해결 3. 관리 컴포넌트의 숨은 의존성</h3><p>Argo CD를 MGMT 노드로 옮겨도 CoreDNS·metrics-server의 기존 배치 조건 때문에 APP 노드가 필요했습니다. 관리 컴포넌트의 nodeSelector를 바꾸는 것과 운영 의존성 전체를 독립시키는 것은 다르다는 점을 확인했습니다. 9월 29일 기존 Argo 배치 변경에서는 7개 Pod Ready와 내부 health 200을 확인했지만, 새로운 환경에서 최초 설치하는 경로의 완전한 재현까지 성공한 것은 아닙니다.</p></section><section id="validation"><span class="section-num">06</span><h2>팀 검증 결과</h2><div class="callout"><p><strong>목표와 관측값을 구분합니다.</strong> 다음 결과는 팀의 특정 시험 조건에서 얻은 값이며, 운영 SLA나 모든 기능의 성공을 의미하지 않습니다.</p></div><p>DR 시험에서는 9월 23일 Workflow 시작부터 실제 GCP 접속 전환까지 약 3분 21초를 관측했습니다. 이 수치는 장애 발생부터 전체 업무가 복구되기까지의 공식 RTO가 아닙니다. 9월 11일 Cutover부터 전체 주문 흐름 복구까지는 36분 41초였고 당시 30분 목표는 충족하지 못했습니다. 측정 구간이 달라 두 숫자로 개선율을 계산하지 않습니다.</p>
-<p>10월 2일 최종 보존 부하 보고서의 mixed100은 최대 100 VU, 피크 유지 10분, 주문 시도 최대 20건 조건에서 HTTP 요청 79,282건·HTTP 오류 0건·전체 HTTP p95 71.50ms·완료 주문 20건을 기록했습니다. 다만 카트 표시 검사 1건 실패와 Carts Pod 3개 Pending이 남았고, 별도 auth50 시험은 실패했습니다. 따라서 전체 기능 성공, 300명 처리 검증, 자동 확장 완성으로 설명하지 않습니다. 이 결과는 팀 시험 결과이며 제가 모든 튜닝과 측정을 단독 수행한 성과는 아닙니다.</p></section><section id="reflection"><span class="section-num">07</span><h2>회고와 개선 방향</h2><ul><li>배포 성공 메시지보다 소스·산출물·선언·실행 상태가 서로 연결되는 증거가 중요했습니다.</li><li>Git에 없는 운영 변경은 다음 Sync에서 유실될 수 있어, 필요한 설정은 선언적 원본으로 되돌려야 합니다.</li><li>승인 운영 규칙과 플랫폼의 기술적 강제 설정은 다릅니다. 모든 변경에 두 사람 승인이 강제되었다고 주장하지 않습니다.</li><li>배포 후 기능 확인, 변경 기록의 보존, 신규 설치 재현, 장애 감지부터 복구까지의 측정 기준을 더 일관되게 만드는 것이 후속 과제입니다.</li><li>RDS Multi-AZ·전체 Failback·격리 Restore 시험과 300명 부하는 완료된 성과가 아닙니다.</li></ul></section><section id="sources"><span class="section-num">08</span><h2>기록과 근거</h2><div class="sources"><p>교육 프로젝트의 서비스 관리 문서, 개인 작업 기록과 팀 검증 보고서를 교차 확인해 정리했습니다. 내부 접속 주소와 인증정보는 제외했습니다.</p><ul><li><a href="https://github.com/AWSome-BIT-Bespin/retail-store-app" target="_blank" rel="noopener">애플리케이션 저장소 ↗</a></li><li><a href="https://github.com/AWSome-BIT-Bespin/retail-store-gitops" target="_blank" rel="noopener">GitOps 저장소 ↗</a></li><li><a href="https://github.com/AWSome-BIT-Bespin/retail-store-infra" target="_blank" rel="noopener">인프라 저장소 ↗</a></li><li><a href="https://github.com/AWSome-BIT-Bespin/retail-store-gitops/pull/9" target="_blank" rel="noopener">PR #9 · AWS Argo CD와 release 이름 정합화 ↗</a></li><li><a href="https://github.com/AWSome-BIT-Bespin/retail-store-gitops/pull/11" target="_blank" rel="noopener">PR #11 · WhaTap 배치 조건을 values에 보존 ↗</a></li></ul></div></section><div class="next"><span>다른 프로젝트 기록</span><a href="petclinic.html">PetClinic · AWS 3-Tier 서비스 연동</a></div></main></div></div>
-<footer>© 2026 송진하 · 이드's Lab. Ship &amp; Verify.</footer></body></html>
+<div class="wrap">
+<div class="hero">
+  <p class="eyebrow">PROJECT LOG / 02 · FINAL</p>
+  <h1>ON MART<br>AWS 운영과 GCP 재해복구</h1>
+  <p class="lead">쇼핑몰의 구매 흐름을 AWS(EKS · RDS)에서 운영하고, 완료 주문을 GCP Cloud SQL에 복제해 장애 시 승인 후 GCP로 전환하는 환경을 구축한 5명 팀 프로젝트입니다. 인프라, Kubernetes 플랫폼, 애플리케이션·데이터, CI/CD, 관측·검증의 다섯 영역으로 나눠 진행했고, 저는 팀 리딩과 CI/CD, GCP 재해복구(DR) PoC를 맡았습니다.</p>
+  <div class="meta"><span>최종 프로젝트</span><span>2026.08–10</span><span>AWSome · 5명 팀</span><span>팀 리딩 · CI/CD · DR PoC 담당</span></div>
+  <p class="reading-note">교육 팀 프로젝트 · 프로젝트 전체 구성과 개인 기여를 구분한 기록</p>
+</div>
+
+<div class="layout">
+<aside class="toc"><strong>CONTENTS</strong><nav aria-label="목차">
+  <a href="#overview">01 프로젝트 개요</a>
+  <a href="#services">02 서비스와 사용자 흐름</a>
+  <a href="#architecture">03 전체 아키텍처</a>
+  <a href="#team">04 팀 구성과 역할</a>
+  <a href="#build">05 영역별 구현</a>
+  <a href="#role">06 나의 담당 영역</a>
+  <a href="#implementation">07 구현과 문제 해결</a>
+  <a href="#validation">08 팀 검증 결과</a>
+  <a href="#reflection">09 회고와 개선 방향</a>
+  <a href="#sources">10 기록과 근거</a>
+</nav></aside>
+
+<main id="content">
+
+<section id="overview"><span class="section-num">01</span><h2>프로젝트 개요</h2>
+<p>글로벌 사용자가 24시간 접속하는 온라인 쇼핑몰을 서비스 시나리오로 정했습니다. 평시에는 조회·구매 요청이 계속 들어오고, 이벤트 때는 요청이 몰리는 상황을 가정했습니다. 목표는 AWS에서 구매 흐름을 운영하면서, AWS 리전 장애에 대비해 GCP에 복구 환경을 준비하는 것이었습니다. 장애 시에는 완료 주문을 가장 먼저 보호하도록 설계했습니다.</p>
+<p>기반 애플리케이션은 AWS가 공개한 <a href="https://github.com/aws-containers/retail-store-sample-app" target="_blank" rel="noopener">Retail Store Sample App</a>이며, 프로젝트 기간은 2026년 8월 31일부터 10월 2일까지입니다. 팀이 정한 목표 지표와 프로젝트 안에서 확인한 범위는 다음과 같습니다.</p>
+<div class="table-scroll"><table>
+  <thead><tr><th>목표</th><th>목표값</th><th>프로젝트에서 확인한 범위</th></tr></thead>
+  <tbody>
+    <tr><td>동시 사용자</td><td>평균 50명 · 최대 300명</td><td>최대 100 VU 혼합 부하까지 시험했습니다. 300명 시험은 하지 않았습니다.</td></tr>
+    <tr><td>업무 복구 시간(RTO)</td><td>120분</td><td>장애 발생부터 업무 복구까지의 전체 측정은 없습니다. 전환 자동화 구간은 200.601초를 관측했습니다.</td></tr>
+    <tr><td>주문 데이터 손실 허용(Orders RPO)</td><td>1분</td><td>정상 조건의 복제 표본을 확인했습니다. 장애 직전 전체 주문의 대조는 검증하지 못했습니다.</td></tr>
+    <tr><td>연간 가용성</td><td>99.7%</td><td>연간 실측은 없습니다.</td></tr>
+  </tbody>
+</table></div>
+<p>목표값은 서비스 시나리오의 설계 기준이며, 실제 고객 수나 운영 실적이 아닙니다.</p>
+</section>
+
+<section id="services"><span class="section-num">02</span><h2>서비스와 사용자 흐름</h2>
+<p>서비스는 5개 구성요소로 나뉩니다. AWS에서는 사용자 상태를 외부 저장소에 두어 Pod를 교체해도 유지되게 했고, GCP 복구 환경은 완료 주문을 이어받는 데 집중했습니다.</p>
+<div class="table-scroll"><table>
+  <thead><tr><th>서비스</th><th>역할</th><th>AWS 저장소</th><th>GCP 복구 환경</th></tr></thead>
+  <tbody>
+    <tr><td>UI</td><td>화면, 로그인 세션, 다른 서비스 호출</td><td>ElastiCache for Valkey</td><td>클러스터 내부 Redis</td></tr>
+    <tr><td>Catalog</td><td>상품·태그 조회</td><td>배포한 JSON 파일로 구성</td><td>같은 방식</td></tr>
+    <tr><td>Cart</td><td>장바구니 저장·조회</td><td>DynamoDB</td><td>앱 메모리</td></tr>
+    <tr><td>Checkout</td><td>구매 진행 상태, 주문 생성 요청</td><td>ElastiCache for Valkey</td><td>클러스터 내부 Redis</td></tr>
+    <tr><td>Orders</td><td>회원·완료 주문 저장·조회</td><td>RDS PostgreSQL</td><td>Cloud SQL PostgreSQL (Cloud DMS로 복제)</td></tr>
+  </tbody>
+</table></div>
+<p>사용자 흐름은 회원가입·로그인 → 상품 조회 → 장바구니 → 배송 정보 입력과 주문 진행 → 데모 주문 생성 → 주문 조회 순서입니다. 실제 결제·정산은 범위에서 제외했습니다.</p>
+<p>GCP로 전환할 때 이어받는 데이터는 완료 주문입니다. 로그인 세션·장바구니·진행 중인 주문은 넘기지 않는 범위로 정했고, 전환 후 기존 계정으로 다시 로그인되는 것은 확인했습니다.</p>
+</section>
+
+<section id="architecture"><span class="section-num">03</span><h2>전체 아키텍처</h2>
+<div class="architecture"><pre>사용자 → Route 53 (운영 주소)
+
+[평시] AWS 서울 · 주 운영
+  Public ALB · WAF → EKS APP 노드 (5개 서비스)
+  EKS MGMT 노드 → Argo CD · 관리 도구
+  저장소 → Valkey · DynamoDB · RDS PostgreSQL
+        │
+        │ Google Cloud DMS · 완료 주문 복제
+        ▼
+[DR 승인 후] GCP 서울 · 복구 환경
+  외부 LB → GKE (5개 서비스)
+  저장소 → 클러스터 내부 Redis · Cloud SQL PostgreSQL
+
+배포: App 저장소 → GitHub Actions → ECR · Artifact Registry
+      → GitOps 배포 입력 → AWS Argo CD 수동 Sync</pre></div>
+<p>평시에는 사용자 요청이 AWS의 ALB를 거쳐 EKS의 서비스로 들어갑니다. RDS의 주문 데이터는 Google Cloud DMS로 GCP Cloud SQL에 계속 복제됩니다. 장애가 나서 전환을 승인하면 Cloud SQL을 승격하고 Route 53의 운영 주소를 GCP로 바꿔, GKE의 서비스가 요청을 처리합니다.</p>
+<p>저장소는 역할에 따라 셋으로 나눴습니다.</p>
+<ul><li>App 저장소: 애플리케이션 소스, Dockerfile, 이미지 CI와 서비스 버전</li><li>Infra 저장소: Terraform·Terragrunt, 클러스터·IAM·환경 입력</li><li>GitOps 저장소: Helm 차트, 환경별 values, 배포 버전, Argo Application과 운영 절차</li></ul>
+</section>
+
+<section id="team"><span class="section-num">04</span><h2>팀 구성과 역할</h2>
+<p>5명이 다섯 영역을 나눠 맡았습니다. 한 영역의 결과물이 다음 영역의 입력이 되기 때문에, 매일 아침 진행 상황·당일 계획·막힌 점을 함께 확인하며 진행했습니다.</p>
+<div class="table-scroll"><table>
+  <thead><tr><th>영역</th><th>주요 책임</th></tr></thead>
+  <tbody>
+    <tr><td>인프라</td><td>AWS·GCP 기반 자원, 네트워크, Terraform 구성</td></tr>
+    <tr><td>Kubernetes 플랫폼</td><td>앱·관리 구성요소의 실행 환경, 배치, 확장, 플랫폼 연결</td></tr>
+    <tr><td>애플리케이션·데이터</td><td>5개 서비스와 업무 흐름, 외부 저장소, 주문 DB</td></tr>
+    <tr><td><strong>CI/CD · DR · 팀 리딩 (본인)</strong></td><td>이미지 빌드·게시, 배포 입력과 Argo CD 연계, GCP 재해복구 PoC, 팀 진행 조율</td></tr>
+    <tr><td>관측·검증</td><td>WhaTap 등 관측 구성, 경보, 부하 시험과 검증 기록</td></tr>
+  </tbody>
+</table></div>
+<p>05의 구현과 08의 검증은 팀 전체의 결과이며, 개인 성과로 합산하지 않습니다. 제가 맡은 부분은 06·07에 따로 정리했습니다.</p>
+</section>
+
+<section id="build"><span class="section-num">05</span><h2>영역별 구현</h2>
+<p>팀 전체가 구현한 내용을 영역별로 정리했습니다.</p>
+
+<h3>인프라</h3>
+<p>Terraform·Terragrunt로 AWS의 VPC·서브넷·NAT·EKS·RDS 같은 기반 자원을 코드로 정의하고, 상태 파일(State)을 S3에 두어 실행했습니다. VPC는 진입(Public)·앱(App)·DB 구간으로 나눴습니다. GCP 복구 환경은 별도 VPC에 GKE와 Cloud SQL 사설 연결을 구성했습니다.</p>
+
+<h3>Kubernetes 플랫폼</h3>
+<p>앱 부하와 운영 도구가 같은 자원을 두고 경쟁하지 않도록 EKS 노드 그룹을 APP와 MGMT로 나누고, 라벨·taint로 배치 규칙을 정했습니다. 사용자 요청은 AWS Load Balancer Controller가 관리하는 ALB를 거쳐 UI로 들어가고, HPA와 Metrics Server로 Pod 자동 확장을 설정했습니다. 관리 접속은 SSM → Bastion → 비공개 EKS API 경로를 사용했습니다. 목표 부하에서 전체 자동 확장이 동작하는지는 검증하지 못했습니다.</p>
+
+<h3>애플리케이션·데이터</h3>
+<p>앱을 교체할 때 사용자 상태가 사라지지 않도록 UI·Checkout의 세션과 진행 상태를 Valkey에, 장바구니를 DynamoDB에 두었습니다. Catalog는 배포한 JSON으로 상품 목록을 다시 구성합니다. Cart는 EKS Pod Identity로 DynamoDB 권한을 받고, Orders의 DB 접속정보는 Secrets Manager에서 ESO를 거쳐 Kubernetes Secret으로 전달했습니다.</p>
+
+<h3>CI/CD (본인 담당)</h3>
+<p>한 번 빌드한 이미지를 ECR과 Artifact Registry 두 곳에 게시하고, GitOps 저장소의 배포 입력을 검토한 뒤 AWS Argo CD 수동 Sync로 반영합니다. 배포는 기존 Pod를 차례로 교체하는 Rolling Update 방식입니다. 자세한 내용은 06·07에 적었습니다.</p>
+
+<h3>관측·검증</h3>
+<p>WhaTap의 Operator·Master·Node Agent와 앱별 APM 에이전트로 클러스터·노드·요청을 관측하고, CloudWatch 연동으로 ALB·RDS·DynamoDB·Valkey 지표를 함께 봤습니다. AWS 경보는 Slack으로 받았습니다. k6 부하 시험을 수행하고 검증 결과를 기록했으며, 주요 결과는 08에 정리했습니다.</p>
+
+<h3>재해복구 (본인 담당 PoC)</h3>
+<p>평시에는 Google Cloud DMS가 RDS의 주문 데이터를 Cloud SQL로 복제합니다. 장애가 나면 사람이 영향을 판단해 Slack에서 승인하고, Step Functions·Lambda가 AWS Orders 축소, 복제 상태 확인, Cloud SQL 승격, Route 53 전환을 차례로 실행합니다. GCP 복구 환경은 최소 규모로 미리 띄워 두는 Warm Standby 방식으로 정했습니다.</p>
+</section>
+
+<section id="role"><span class="section-num">06</span><h2>나의 담당 영역</h2>
+<p>팀 리딩에서는 매일 아침 AI 보고를 참고해 팀원들과 진행 상황·당일 계획·막힌 점을 확인하고 피드백을 주고받았습니다. 모니터링 담당자의 어려움을 듣고 주문 한 건의 처리 흐름부터 관찰하는 방안을 논의했고, 고객의 주문 완료까지 이어지는 사용 흐름을 바탕으로 부하 테스트 방향을 제안했습니다.</p>
+<p>CI/CD에서는 서비스별 빌드·게시 조건, AWS OIDC 인증 진단, Helm 렌더 검사, AWS/GCP 설정 입력 검증, Argo CD 설치·배포 연결과 릴리스 인계 문서를 중심으로 작업했습니다. namespace·ServiceAccount·Secret·서비스 연결을 함께 검사해, 각 담당자가 만든 구성요소가 배포 단계에서 맞물리도록 했습니다.</p>
+<p>AWS 리전 장애에 대비한 GCP 재해복구(DR) PoC도 맡았습니다. GKE 복구 환경에 서비스를 배포하고, Cloud DMS로 RDS의 주문 데이터를 Cloud SQL에 복제하도록 구성했습니다. 장애 시에는 Slack 알림 후 담당자 승인을 거쳐 DB 승격과 DNS 변경이 실행되도록 했고, AWS를 중단한 상태에서 전환한 뒤 서비스 요청이 정상 처리되는 것을 확인했습니다.</p>
+<p>DMS 접속정보 갱신처럼 DB 복제 구성 중 다른 팀원이 맡은 작업, 전체 인프라와 APM 계측은 개인 성과에 포함하지 않습니다. DR 시험의 전환 시간 측정은 08 팀 검증 결과에 따로 적었습니다.</p>
+</section>
+
+<section id="implementation"><span class="section-num">07</span><h2>구현과 문제 해결</h2>
+<p>CI/CD 영역에서 제가 구현하고 해결한 내용입니다.</p>
+<h3>구현 1. 한 번 빌드한 이미지의 게시와 추적</h3>
+<p>App 변경과 버전 입력을 바탕으로 대상 서비스 이미지를 빌드하고 ECR·GAR에 게시하는 흐름을 구성했습니다. 게시 성공 여부만 보지 않고 서비스별 태그, 소스 SHA, Actions 실행, digest를 함께 인계했습니다. 두 클라우드에서 사용할 이미지의 내용이 같은지 추적할 수 있도록 한 것입니다.</p>
+<h3>구현 2. GitOps 입력과 정적 검증</h3>
+<p>GitOps에서 환경 values와 서비스 버전 입력을 관리하고 Helm 렌더 결과를 검사했습니다. AWS/GCP의 namespace, Secret 참조, Service 연결과 같은 계약을 배포 전에 확인했습니다. 로컬 검사 통과와 GitHub CI 실행 결과를 구분했고, 정적 검사 성공을 실제 GCP 배포 성공으로 바꾸어 기록하지 않았습니다.</p>
+<h3>구현 3. 수동 Sync와 배포 후 확인</h3>
+<p>이미지 게시 이후 GitOps 버전 변경과 Argo CD 수동 Sync를 거쳐 배포하도록 연결했습니다. 이미지 자동 업데이트·GitOps 자동 PR·자동 Sync까지 구현한 완전 자동 배포는 아닙니다. 배포 시에는 대상 revision과 상태를 확인하고, 실행 중인 Pod imageID를 게시된 digest와 대조했습니다.</p>
+<p>대표 사례인 9월 30일 UI v0.1.8 배포에서는 소스 SHA → Actions → ECR·GAR digest → GitOps PR → Argo revision → Pod imageID → 화면 배지를 연결한 기록을 남겼습니다.</p>
+<h3>문제 해결 1. 배포 이름과 selector 불일치</h3>
+<p>GitOps의 Application·releaseName과 실제 설치된 Helm release 이름이 달랐습니다. namespace만 맞추면 된다고 가정하지 않고 Deployment selector·Service 대상·소유권 연결을 함께 확인했습니다. PR #9에서 이름을 retail-store로 정합화하고 후속 배포 기록으로 연결했습니다.</p>
+<h3>문제 해결 2. Sync 후 사라진 관측 도구 배치 조건</h3>
+<p>실제 클러스터에만 남아 있던 WhaTap의 MGMT 배치 조건이 Sync 이후 사라지는 문제를 확인했습니다. PR #11에 nodeSelector·toleration을 AWS values로 반영해 선언적 원본에 보존했습니다. 후속 Sync에서는 master가 MGMT에서 Running이고 node agent 4개가 APP·MGMT 노드에 Running인 상태를 확인했습니다. 관측 설계 전체가 아니라 배포 조건의 보존·통합 작업입니다.</p>
+<h3>문제 해결 3. 관리 컴포넌트의 숨은 의존성</h3>
+<p>Argo CD를 MGMT 노드로 옮겨도 CoreDNS·metrics-server의 기존 배치 조건 때문에 APP 노드가 필요했습니다. 관리 컴포넌트의 nodeSelector를 바꾸는 것과 운영 의존성 전체를 독립시키는 것은 다르다는 점을 확인했습니다. 9월 29일 기존 Argo 배치 변경에서는 7개 Pod Ready와 내부 health 200을 확인했지만, 새로운 환경에서 최초 설치하는 경로의 완전한 재현까지 성공한 것은 아닙니다.</p>
+</section>
+
+<section id="validation"><span class="section-num">08</span><h2>팀 검증 결과</h2>
+<div class="callout"><p><strong>목표와 관측값을 구분합니다.</strong> 다음 결과는 팀의 특정 시험 조건에서 얻은 값이며, 운영 SLA나 모든 기능의 성공을 의미하지 않습니다.</p></div>
+<div class="table-scroll"><table>
+  <thead><tr><th>시험</th><th>확인한 결과</th></tr></thead>
+  <tbody>
+    <tr><td>배포 상태 확인 (9/16)</td><td>리소스 27개의 Synced/Healthy 상태와 5개 서비스의 Pod 10개 준비 상태를 확인하고, 데모 주문과 재로그인 후 주문 조회까지 확인했습니다.</td></tr>
+    <tr><td>앱 교체와 상태 유지</td><td>로그인 세션과 Checkout 상태를 Valkey에 두고, UI·Checkout Pod를 교체한 뒤에도 상태가 유지되는 것을 확인했습니다.</td></tr>
+    <tr><td>캐시 장애 전환</td><td>Valkey 주 노드 장애 전환 후에도 서비스가 정상 동작하는 것을 확인했습니다.</td></tr>
+    <tr><td>혼합 부하 (10/2)</td><td>최대 100 VU·피크 10분 유지 조건에서 HTTP 79,282건 중 실패 0건, 전체 p95 71.50ms, 주문 20/20건 완료를 기록했습니다.</td></tr>
+    <tr><td>주문 데이터 복제 (9/7)</td><td>RDS의 주문 데이터를 Cloud SQL로 복제해 순차 주문 50/50건 반영과 이후 표본 주문·복제 지연을 확인했습니다.</td></tr>
+    <tr><td>승인 후 DR 전환 (9/23)</td><td>Slack 승인 후 DB 승격·DNS 변경으로 전환해, 전환 자동화 시작부터 실제 GCP 연결까지 200.601초(약 3분 21초)를 관측했습니다.</td></tr>
+  </tbody>
+</table></div>
+<p>DR 전환의 200.601초는 장애 발생부터 전체 업무가 복구되기까지의 공식 RTO가 아닙니다. 9월 11일 Cutover부터 전체 주문 흐름 복구까지는 36분 41초였고 당시 30분 목표는 충족하지 못했습니다. 측정 구간이 달라 두 숫자로 개선율을 계산하지 않습니다.</p>
+<p>혼합 부하 시험에서는 카트 표시 검사 1건 실패와 Carts Pod 3개 Pending이 남았고, 별도 auth50 시험은 실패했습니다. 따라서 전체 기능 성공, 300명 처리 검증, 자동 확장 완성으로 설명하지 않습니다.</p>
+</section>
+
+<section id="reflection"><span class="section-num">09</span><h2>회고와 개선 방향</h2>
+<ul><li>배포 성공 메시지보다 소스·산출물·선언·실행 상태가 서로 연결되는 증거가 중요했습니다.</li><li>Git에 없는 운영 변경은 다음 Sync에서 유실될 수 있어, 필요한 설정은 선언적 원본으로 되돌려야 합니다.</li><li>승인 운영 규칙과 플랫폼의 기술적 강제 설정은 다릅니다. 모든 변경에 두 사람 승인이 강제되었다고 주장하지 않습니다.</li><li>배포 후 기능 확인, 변경 기록의 보존, 신규 설치 재현, 장애 감지부터 복구까지의 측정 기준을 더 일관되게 만드는 것이 후속 과제입니다.</li><li>RDS Multi-AZ·전체 Failback·격리 Restore 시험과 300명 부하는 완료된 성과가 아닙니다.</li></ul>
+</section>
+
+<section id="sources"><span class="section-num">10</span><h2>기록과 근거</h2>
+<div class="sources"><p>교육 프로젝트의 프로젝트 개요서·아키텍처 설계서, 서비스 관리 문서, 개인 작업 기록과 팀 검증 보고서를 교차 확인해 정리했습니다. 내부 접속 주소와 인증정보는 제외했습니다.</p><ul><li><a href="https://github.com/AWSome-BIT-Bespin/retail-store-app" target="_blank" rel="noopener">애플리케이션 저장소 ↗</a></li><li><a href="https://github.com/AWSome-BIT-Bespin/retail-store-gitops" target="_blank" rel="noopener">GitOps 저장소 ↗</a></li><li><a href="https://github.com/AWSome-BIT-Bespin/retail-store-infra" target="_blank" rel="noopener">인프라 저장소 ↗</a></li><li><a href="https://github.com/AWSome-BIT-Bespin/retail-store-gitops/pull/9" target="_blank" rel="noopener">PR #9 · AWS Argo CD와 release 이름 정합화 ↗</a></li><li><a href="https://github.com/AWSome-BIT-Bespin/retail-store-gitops/pull/11" target="_blank" rel="noopener">PR #11 · WhaTap 배치 조건을 values에 보존 ↗</a></li></ul></div>
+</section>
+
+<div class="next"><span>다른 프로젝트 기록</span><a href="petclinic.html">PetClinic · AWS 3-Tier 서비스 연동</a></div>
+</main>
+</div>
+</div>
+<footer>© 2026 송진하 · 이드's Lab. Ship &amp; Verify.</footer>
+</body>
+</html>
