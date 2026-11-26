@@ -187,7 +187,7 @@ ul.tl-desc li + li{margin-top:2px}
 .career .ph-note{margin-top:22px}
 
 /* ===== ④ 기술·교육 ===== */
-.skills .edu-grid{display:grid; grid-template-columns:1fr 1fr; gap:clamp(30px,5vw,60px); align-items:start}
+.skills .edu-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.2fr); gap:clamp(30px,5vw,60px); align-items:start}
 .col-h{font-family:var(--disp); font-weight:700; font-size:12.5px; letter-spacing:.06em; color:var(--ink-3); margin-bottom:14px}
 .edu-card{border:1px solid var(--line); border-radius:14px; padding:20px; margin-bottom:12px}
 .edu-card .ec-k{font-family:var(--disp); font-weight:800; font-size:11px; letter-spacing:.05em; color:var(--blue)}
@@ -279,10 +279,7 @@ html:not(.js) .tabs{display:none}
 .slide .src{font-family:var(--disp); font-weight:700; font-size:11px; letter-spacing:.02em; color:var(--on-panel-soft); border:1px solid var(--on-panel-line); border-radius:999px; padding:5px 11px}
 .slide .src.read{align-self:flex-start; margin-top:12px; color:var(--paper); border-color:var(--on-panel-line-strong); padding:8px 14px; font-size:13px}
 .slide a.src:hover{color:var(--on-panel); border-color:var(--on-panel-soft)}
-.slide .team{margin-top:16px; font-size:13px; color:var(--on-panel); line-height:1.6; border-left:2px solid var(--blue); padding-left:13px}
-.slide .team span{color:var(--on-panel-soft)}
-.slide .limit{margin-top:14px; font-size:12.5px; color:var(--on-panel-soft); line-height:1.6}
-.slide .limit b{color:var(--on-panel); font-weight:700}
+.slide .team-note{margin-top:10px; font-size:12px; line-height:1.5; color:var(--on-panel-soft)}
 /* 흐름도: 단계 사이를 꺾쇠로 잇는다(좁은 화면에서는 세로) */
 .slide .flow{list-style:none; margin:14px 0 0; padding:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:20px}
 .slide .flow li{position:relative; border:1px solid var(--on-panel-line); border-radius:10px; padding:9px 11px 10px; font-size:12.5px; line-height:1.45; color:var(--on-panel-soft)}
@@ -311,7 +308,8 @@ html:not(.js) .tabs{display:none}
 .rail button .bar{width:40px; height:2px; background:var(--line); transform:scaleX(.65); transform-origin:100% 50%; transition:background-color .2s var(--ease), transform .2s var(--ease)}
 .rail button[aria-current="true"] .bar{background:var(--blue); transform:none}
 .rail button[aria-current="true"]{color:var(--ink)}
-@media (max-width:720px){ .rail{display:none} }
+/* 세로 스크롤 화면(820px 이하)에서는 장 이동 막대가 본문 오른쪽을 덮으므로 숨긴다 */
+@media (max-width:820px){ .rail{display:none} }
 
 /* 하단 힌트 */
 .hint{position:fixed; left:50%; bottom:20px; transform:translateX(-50%); z-index:55; font-family:var(--disp); font-weight:600; font-size:11px; letter-spacing:.14em; color:var(--ink-3); display:flex; align-items:center; gap:9px; transition:opacity .5s var(--ease) .4s}
@@ -320,7 +318,12 @@ html:not(.js) .tabs{display:none}
 .hint .m{width:16px; height:26px; border:1.5px solid var(--ink-3); border-radius:9px; position:relative}
 .hint .m::after{content:""; position:absolute; left:50%; top:5px; width:2px; height:5px; background:var(--ink-3); border-radius:2px; transform:translateX(-50%); animation:wheel 1.5s var(--ease) infinite}
 @keyframes wheel{0%{opacity:0; transform:translate(-50%,0)} 40%{opacity:1} 100%{opacity:0; transform:translate(-50%,8px)}}
-@media (max-width:720px){ .hint{display:none} }
+@media (max-width:820px){ .hint{display:none} }
+/* 덱 화면: 오른쪽 장 이동 막대와 본문 사이에 여백을 두고, 프로젝트 칸의 글이 스크롤 막대에 붙지 않게 한다 */
+@media (min-width:821px){
+  .page{padding-left:max(var(--pad),104px); padding-right:max(var(--pad),104px)}
+  .slide{padding-right:18px}
+}
 
 /* ===== 반응형: 모바일 일반 스크롤 ===== */
 @media (max-width:820px){
@@ -573,8 +576,16 @@ html:not(.js) .tabs{display:none}
                 <div class="feat"><span class="ok">OK</span><p><b>경로 정렬</b> <span>— GCP 설정 경로와 CI 검사 경로 불일치 수정 (9/22 커밋)</span></p></div>
                 <div class="feat"><span class="ok">OK</span><p><b>GCP 재해복구(DR) PoC</b> <span>— GKE 복구 환경·Cloud DMS 복제 구성, 승인(Slack → DB 승격·DNS) 후 전환해 AWS 중단 상태에서 정상 처리 확인</span></p></div>
               </div>
-              <div class="team"><b>팀 검증</b> — 최대 100 VU 혼합 부하(HTTP 79,282건 · 실패 0 · p95 71.50ms, 주문 20/20), 승인 후 GCP 전환 200.601초 관측. <span>※ 300명은 목표(미실시), 일부 검사 실패 존재, 200.601초는 관측값으로 공식 RTO 아님</span></div>
-              <div class="limit"><b>한계 · 보완</b> — NetworkPolicy는 작성했으나 미적용·미시험, RDS Multi-AZ · 백업 Restore 미수행. 30일 교대 계정 · Blue/Green은 후속 설계. GCP 최종 배포 도구를 Argo CD로 단정하지 않습니다.</div>
+              <div class="evlabel">팀 검증 결과</div>
+              <ul class="team-list">
+                <li><b>배포 상태 확인</b> — 리소스 27개의 Synced/Healthy 상태와 5개 서비스의 Pod 10개 준비 상태를 확인하고, 데모 주문과 재로그인 후 주문 조회까지 확인했습니다(9/16).</li>
+                <li><b>앱 교체와 상태 유지</b> — 로그인 세션과 Checkout 상태를 외부 저장소(Valkey)에 두고, Pod를 교체한 뒤에도 상태가 유지되는 것을 확인했습니다.</li>
+                <li><b>캐시 장애 전환</b> — Valkey 주 노드 장애 전환 후에도 서비스가 정상 동작하는 것을 확인했습니다.</li>
+                <li><b>혼합 부하</b> — 최대 100 VU·피크 10분 유지 조건에서 HTTP 79,282건 중 실패 0건, 전체 p95 71.50ms, 주문 20/20건 완료를 기록했습니다.</li>
+                <li><b>주문 데이터 복제</b> — RDS의 주문 데이터를 Cloud SQL로 복제해 순차 주문 50/50건 반영(9/7)과 이후 표본 주문·복제 지연을 확인했습니다.</li>
+                <li><b>승인 후 DR 전환</b> — Slack 승인 후 DB 승격·DNS 변경으로 전환해, 전환 자동화 시작부터 실제 GCP 연결까지 200.601초(약 3분 21초)를 관측했습니다(9/23).</li>
+              </ul>
+              <p class="team-note">※ 300명은 목표(미실시), 일부 검사 실패 존재, 200.601초는 관측값으로 공식 RTO 아님</p>
               <div class="srcs">
                 <a class="src" href="https://github.com/AWSome-BIT-Bespin/retail-store-app" target="_blank" rel="noopener">GitHub · app <span aria-hidden="true">↗</span></a>
                 <a class="src" href="https://github.com/AWSome-BIT-Bespin/retail-store-gitops" target="_blank" rel="noopener">GitHub · gitops <span aria-hidden="true">↗</span></a>
