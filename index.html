@@ -562,20 +562,20 @@ html:not(.js) .tabs{display:none}
               <h3>Retail Store · AWS 운영 &amp; GCP 재해복구</h3>
               <div class="meta">2026.08 – 10 · 팀 AWSome 5명</div>
               <a class="src read" href="projects/retail-store.html">프로젝트 기록 자세히 읽기 <span aria-hidden="true">↗</span></a>
-              <p class="role"><b>담당 역할:</b> CI/CD · DR · 팀 리딩</p>
-              <p class="detail">AWS(EKS · RDS)에서 쇼핑몰을 운영하고 완료 주문을 GCP(GKE · Cloud SQL)에 복제해, 장애 시 승인 후 전환하는 환경을 구성했습니다. CI/CD(이미지 빌드·게시, AWS Argo CD 수동 Sync)와 함께, AWS 리전 장애에 대비한 GCP 재해복구(DR) PoC를 맡아 복구 환경 구성과 전환 검증을 담당했습니다.</p>
+              <p class="role"><b>담당 역할:</b> 팀 리딩 · CI/CD · GCP 재해복구(DR) PoC</p>
+              <p class="detail">AWS(EKS · RDS)에서 쇼핑몰을 운영하고 완료 주문을 GCP Cloud SQL에 복제해, 장애 시 승인 후 GCP 환경으로 전환하는 구성을 구현했습니다. 팀 전체를 이끌며 CI/CD 파이프라인 구축과 AWS 리전 장애에 대비한 GCP 재해복구(DR) PoC를 맡아, 이미지 빌드·게시부터 복구 환경 구성과 전환 검증까지 담당했습니다.</p>
               <ol class="flow" aria-label="AWS 운영에서 GCP 재해복구로 전환하는 흐름">
                 <li><b>AWS 운영</b>EKS · RDS에서 쇼핑몰 운영</li>
-                <li><b>주문 데이터 복제</b>RDS → GCP Cloud SQL (Cloud DMS)</li>
+                <li><b>주문 데이터 복제</b>RDS → GCP Cloud SQL(Cloud DMS)</li>
                 <li><b>승인 후 전환</b>장애 시 Slack 승인 → DB 승격 · DNS 변경</li>
-                <li class="end"><b>GCP에서 처리</b>GKE로 요청 처리, AWS 중단 상태에서 확인</li>
+                <li class="end"><b>GCP에서 처리</b>GKE로 요청 처리, AWS 중단 상태에서 동작 확인</li>
               </ol>
               <div class="evlabel">내 역할 · 검증 근거</div>
               <div class="feats">
-                <div class="feat"><span class="ok">OK</span><p><b>이미지 빌드 · 게시</b> <span>— GitHub Actions로 검사·빌드, ECR · Artifact Registry 게시</span></p></div>
-                <div class="feat"><span class="ok">OK</span><p><b>AWS Argo CD 수동 Sync</b> <span>— 승인한 배포 입력을 수동 동기화로 반영</span></p></div>
-                <div class="feat"><span class="ok">OK</span><p><b>경로 정렬</b> <span>— GCP 설정 경로와 CI 검사 경로 불일치 수정 (9/22 커밋)</span></p></div>
-                <div class="feat"><span class="ok">OK</span><p><b>GCP 재해복구(DR) PoC</b> <span>— GKE 복구 환경·Cloud DMS 복제 구성, 승인(Slack → DB 승격·DNS) 후 전환해 AWS 중단 상태에서 정상 처리 확인</span></p></div>
+                <div class="feat"><span class="ok">OK</span><p><b>팀 리딩 및 협업 조율</b> <span>— 매일 아침 AI 보고를 참고해 팀원들과 진행 상황·당일 계획·막힌 점을 확인하고 피드백을 주고받았습니다. 모니터링 담당자의 어려움을 듣고, 주문 한 건의 처리 흐름부터 관찰하는 방안을 논의하고, 고객의 주문 완료까지 이어지는 사용 흐름을 바탕으로 부하 테스트 방향을 제안했습니다.</span></p></div>
+                <div class="feat"><span class="ok">OK</span><p><b>이미지 빌드·게시</b> <span>— GitHub Actions로 검사·빌드를 수행하고, 이미지를 ECR · Artifact Registry에 게시했습니다.</span></p></div>
+                <div class="feat"><span class="ok">OK</span><p><b>AWS Argo CD 수동 Sync</b> <span>— 승인한 배포 입력을 수동 동기화로 반영했습니다.</span></p></div>
+                <div class="feat"><span class="ok">OK</span><p><b>GCP 재해복구(DR) PoC</b> <span>— GKE 복구 환경과 Cloud DMS 복제를 구성했습니다. Slack 승인 후 DB 승격·DNS 변경으로 전환하고, AWS가 중단된 상태에서 정상 처리를 확인했습니다.</span></p></div>
               </div>
               <div class="evlabel">팀 검증 결과</div>
               <ul class="team-list">
