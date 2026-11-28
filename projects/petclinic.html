@@ -61,13 +61,13 @@
 <section id="team"><span class="section-num">02</span><h2>담당 역할과 협업</h2>
 <h3>팀의 역할 분담</h3>
 <div class="table-scroll"><table>
-  <thead><tr><th>영역</th><th>담당 범위</th></tr></thead>
+  <thead><tr><th>담당자</th><th>담당 영역</th></tr></thead>
   <tbody>
-    <tr><td>팀장 · 모니터링</td><td>일정 및 산출물 조율·모니터링</td></tr>
-    <tr><td>인프라</td><td>VPC·서브넷·라우팅·NAT·ALB</td></tr>
-    <tr><td><strong>서비스 리소스 (본인)</strong></td><td>Apache·Tomcat·PetClinic</td></tr>
-    <tr><td>보안</td><td>SG·IAM·SSM·WAF</td></tr>
-    <tr><td>확장 설계</td><td>ASG·Reader 확장 및 후속 확장 기술 검토</td></tr>
+    <tr><td>이용희</td><td>팀장·일정 및 산출물 조율·모니터링</td></tr>
+    <tr><td>김원섭</td><td>VPC·서브넷·라우팅·NAT·ALB 등 인프라</td></tr>
+    <tr><td><strong>송진하</strong></td><td>Apache·Tomcat·PetClinic 등 서비스 리소스</td></tr>
+    <tr><td>김연우</td><td>SG·IAM·SSM·WAF 등 보안</td></tr>
+    <tr><td>김민석</td><td>ASG·Reader 확장 및 후속 확장 기술 검토</td></tr>
   </tbody>
 </table></div>
 
@@ -85,19 +85,10 @@
 </section>
 
 <section id="architecture"><span class="section-num">03</span><h2>전체 아키텍처와 요청 흐름</h2>
+<figure class="diagram"><a href="../assets/petclinic-architecture.webp"><img src="../assets/petclinic-architecture.webp" width="1536" height="1024" loading="lazy" alt="PetClinic AWS 아키텍처. 사용자가 Route 53으로 도메인을 조회한 뒤 VPC 10.0.0.0/21의 외부 ALB에 접속하고, 요청은 Web ASG의 Apache, 내부 ALB, WAS ASG의 Tomcat을 거쳐 Aurora 클러스터로 이어진다. AZ-a와 AZ-c에 Public·Web·WAS·DB 서브넷과 NAT Gateway가 하나씩 있다. 오른쪽에는 운영 서비스(CloudWatch, CloudTrail, VPC Flow Logs, Systems Manager)와 확장 설계 방향(WAF, ElastiCache, EFS, CloudFront, S3)이 있다."></a></figure>
 <h3>Web·WAS·DB 3계층 구성</h3>
 <p>주요 요청 흐름은 다음과 같습니다.</p>
-<div class="architecture"><pre>사용자
-  ↓
-외부 ALB
-  ↓
-Apache
-  ↓
-내부 ALB
-  ↓
-Tomcat·PetClinic
-  ↓
-Aurora</pre></div>
+<p><strong>사용자 → 외부 ALB → Apache → 내부 ALB → Tomcat·PetClinic → Aurora</strong></p>
 <div class="table-scroll"><table>
   <thead><tr><th>구성 요소</th><th>역할</th></tr></thead>
   <tbody>
@@ -401,7 +392,7 @@ Aurora</pre></div>
     <tr><td>시연 영상</td><td>보호자 검색·등록 후 재조회, 수의사 목록, XML·JSON 조회</td></tr>
   </tbody>
 </table></div>
-<p>최종 발표자료는 팀의 <strong>32쪽 최종 발표자료</strong>를 기준으로 했습니다. 자료의 이전 설정이나 잘못된 표기는 실제 변경 이력과 구분해 본문에 반영했습니다.</p>
+<p>최종 발표자료는 <strong>「[최종] 3팀 이용희 외 4인」 32쪽 자료</strong>를 기준으로 했습니다. 자료의 이전 설정이나 잘못된 표기는 실제 변경 이력과 구분해 본문에 반영했습니다.</p>
 <p><a href="https://drive.google.com/file/d/1AeFZn9R5jJy1nMjpxvZfKYRtungm2FSH/view">PetClinic 서비스 시연 영상 보기</a></p>
 </section>
 
