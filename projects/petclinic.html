@@ -85,7 +85,7 @@
 </section>
 
 <section id="architecture"><span class="section-num">03</span><h2>전체 아키텍처와 요청 흐름</h2>
-<figure class="diagram"><a href="../assets/petclinic-architecture.webp"><img src="../assets/petclinic-architecture.webp" width="1536" height="1024" loading="lazy" alt="PetClinic AWS 아키텍처. 사용자가 Route 53으로 도메인을 조회한 뒤 VPC 10.0.0.0/21의 외부 ALB에 접속하고, 요청은 Web ASG의 Apache, 내부 ALB, WAS ASG의 Tomcat을 거쳐 Aurora 클러스터로 이어진다. AZ-a와 AZ-c에 Public·Web·WAS·DB 서브넷과 NAT Gateway가 하나씩 있다. 오른쪽에는 운영 서비스(CloudWatch, CloudTrail, VPC Flow Logs, Systems Manager)와 확장 설계 방향(WAF, ElastiCache, EFS, CloudFront, S3)이 있다."></a></figure>
+<figure class="diagram"><a href="../assets/petclinic-architecture.png"><img src="../assets/petclinic-architecture.png" width="2048" height="1312" loading="lazy" alt="AWS 3-Tier Architecture. 사용자가 Route 53으로 도메인을 조회한 뒤 VPC 10.0.0.0/21의 External ALB에 접속하고, 요청은 Web Auto Scaling의 Apache EC2, Internal ALB, WAS Auto Scaling group의 Tomcat EC2를 거쳐 Aurora Cluster Endpoint로 이어진다. Aurora는 Writer Instance와 Reader/Failover Target으로 나뉜다. AZ-a와 AZ-c에 Public·Private Web·Private WAS·Private DB 서브넷이 있고, 각 Public 서브넷에 NAT Gateway가 있다. 오른쪽에는 AWS Operations &amp; Security(ACM, Systems Manager, IAM)와 Shared &amp; Future Services(WAF)가 있다."></a></figure>
 <h3>Web·WAS·DB 3계층 구성</h3>
 <p>주요 요청 흐름은 다음과 같습니다.</p>
 <p><strong>사용자 → 외부 ALB → Apache → 내부 ALB → Tomcat·PetClinic → Aurora</strong></p>
